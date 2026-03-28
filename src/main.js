@@ -231,11 +231,10 @@ function openModal(type, data = null) {
         document.getElementById('prompt-modal-title').innerText = data ? 'Editar Prompt' : 'Novo Prompt';
         if (data) {
             document.getElementById('p-titulo').value = data.titulo;
-            document.getElementById('p-descricao').value = data.descricao;
-            document.getElementById('p-prompt').value = prompt; // variable prompt contains the actual text
+            document.getElementById('p-descricao').value = data.descricao || '';
             document.getElementById('p-prompt').value = data.prompt;
-            document.getElementById('p-categoria').value = data.categoria;
-            document.getElementById('p-imagem-url').value = data.imagem_url;
+            document.getElementById('p-categoria').value = data.categoria || 'ARTE';
+            document.getElementById('p-imagem-url').value = data.imagem_url || '';
             form.querySelector('button[type="submit"]').innerText = 'Salvar Alterações';
         } else {
             form.querySelector('button[type="submit"]').innerText = 'Criar Prompt';
