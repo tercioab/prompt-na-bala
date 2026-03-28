@@ -1,6 +1,7 @@
 import { 
     buscarPrompts, criarPrompt, editarPrompt, deletarPrompt, 
-    buscarAnotacoes, criarAnotacao, editarAnotacao, deletarAnotacao 
+    buscarAnotacoes, criarAnotacao, editarAnotacao, deletarAnotacao,
+    uploadImagem
 } from './supabase.js';
 
 // --- ESTADO DA APLICAÇÃO ---
@@ -168,9 +169,18 @@ function setupEventListeners() {
     elements.navPrompts.addEventListener('click', () => switchTab('prompts'));
     elements.navAnotacoes.addEventListener('click', () => switchTab('anotacoes'));
 
-    // Modais
+    // Botões de Abrir Modal
     elements.btnNewPrompt.addEventListener('click', () => openModal('prompt'));
     elements.btnNewAnotacao.addEventListener('click', () => openModal('anotacao'));
+
+    // Seleção de Arquivo (Visual)
+    const fileInput = document.getElementById('p-imagem-file');
+    const fileChosen = document.getElementById('file-chosen');
+    if (fileInput) {
+        fileInput.addEventListener('change', () => {
+            fileChosen.textContent = fileInput.files[0] ? fileInput.files[0].name : 'Nenhum arquivo selecionado';
+        });
+    }
 
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', closeModal);
@@ -263,21 +273,40 @@ function closeModal() {
     elements.modalPrompt.classList.remove('active');
     elements.modalAnotacao.classList.remove('active');
     elements.modalViewPrompt.classList.remove('active');
+    
+    // Reset file info
+    const fileChosen = document.getElementById('file-chosen');
+    if (fileChosen) fileChosen.textContent = 'Nenhum arquivo selecionado';
+    const fileInput = document.getElementById('p-imagem-file');
+    if (fileInput) fileInput.value = '';
 }
 
 // --- CRUD HANDLERS ---
 async function handlePromptSubmit(e) {
     e.preventDefault();
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerText;
+    
     const id = document.getElementById('prompt-id').value;
-    const dados = {
-        titulo: document.getElementById('p-titulo').value,
-        descricao: document.getElementById('p-descricao').value,
-        prompt: document.getElementById('p-prompt').value,
-        categoria: document.getElementById('p-categoria').value,
-        imagem_url: document.getElementById('p-imagem-url').value
-    };
+    const fileInput = document.getElementById('p-imagem-file');
+    let imagemUrl = document.getElementById('p-imagem-url').value;
 
     try {
+        submitBtn.innerText = 'Processando...';
+        submitBtn.disabled = true;
+
+        // Se houver arquivo, faz o upload primeiro
+        if (fileInput && fileInput.files[0]) {
+            imagemUrl = await uploadImagem(fileInput.files[0]);
+        }
+
+        const dados = {
+            titulo: document.getElementById('p-titulo').value,
+            descricao: document.getElementById('p-descricao').value,
+            prompt: document.getElementById('p-prompt').value,
+            categoria: document.getElementById('p-categoria').value,
+            imagem_url: imagemUrl
+        };
         if (id) {
             await editarPrompt(id, dados);
         } else {
@@ -288,6 +317,9 @@ async function handlePromptSubmit(e) {
         renderAll();
     } catch (err) {
         alert("Erro ao salvar prompt: " + err.message);
+    } finally {
+        submitBtn.innerText = originalBtnText;
+        submitBtn.disabled = false;
     }
 }
 

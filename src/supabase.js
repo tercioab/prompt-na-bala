@@ -62,3 +62,22 @@ export async function deletarAnotacao(id) {
   if (error) throw error;
   return true;
 }
+
+// --- STORAGE ---
+export async function uploadImagem(file) {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+  const filePath = `${fileName}`;
+
+  const { error } = await supabase.storage
+    .from('prompts')
+    .upload(filePath, file);
+
+  if (error) throw error;
+
+  const { data } = supabase.storage
+    .from('prompts')
+    .getPublicUrl(filePath);
+
+  return data.publicUrl;
+}
