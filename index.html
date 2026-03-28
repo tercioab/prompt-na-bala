@@ -10,60 +10,176 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/src/style.css">
 </head>
-<body>
-    <header class="main-header">
-        <div class="container header-content">
-            <div class="logo">
+<body class="loading">
+    <!-- Tela de Verificação Inicial (Loading App) -->
+    <div id="app-loader" class="screen-overlay">
+        <div class="loader-content">
+            <div class="logo logo-large">
+                <span class="logo-text">PV</span>
+            </div>
+            <div class="loader-spinner"></div>
+        </div>
+    </div>
+
+    <!-- TELA DE AUTENTICAÇÃO -->
+    <div id="auth-screen" class="screen-overlay hidden">
+        <div class="auth-card">
+            <div class="logo logo-centered">
                 <span class="logo-text">PV</span>
                 <span class="logo-full">PromptVault</span>
             </div>
-            <nav class="main-nav">
-                <button id="nav-prompts" class="nav-btn active">PROMPTS</button>
-                <button id="nav-anotacoes" class="nav-btn">ANOTAÇÕES</button>
-            </nav>
+            
+            <!-- Login -->
+            <div id="auth-login">
+                <h2 class="auth-title">Entrar</h2>
+                <form id="form-login">
+                    <div class="form-group">
+                        <label for="l-email">Email</label>
+                        <input type="email" id="l-email" placeholder="seu@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="l-password">Senha</label>
+                        <div class="input-with-icon">
+                            <input type="password" id="l-password" placeholder="••••••••" required>
+                            <button type="button" class="btn-toggle-pass" tabindex="-1">👁</button>
+                        </div>
+                        <p id="l-error" class="form-error hidden"></p>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="btn-login-submit">
+                        <span class="btn-text">Entrar</span>
+                        <span class="btn-spinner hidden">⟳</span>
+                    </button>
+                </form>
+                <p class="auth-switch">
+                    Não tem conta? <a href="#" id="go-to-signup">Cadastre-se</a>
+                </p>
+            </div>
+
+            <!-- Cadastro -->
+            <div id="auth-signup" class="hidden">
+                <h2 class="auth-title">Criar Conta</h2>
+                <form id="form-signup">
+                    <div class="form-group">
+                        <label for="s-nome">Nome</label>
+                        <input type="text" id="s-nome" placeholder="Seu nome" required>
+                        <p id="s-error-nome" class="form-error hidden"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="s-email">Email</label>
+                        <input type="email" id="s-email" placeholder="seu@email.com" required>
+                        <p id="s-error-email" class="form-error hidden"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="s-password">Senha</label>
+                        <div class="input-with-icon">
+                            <input type="password" id="s-password" placeholder="Mínimo 6 caracteres" required>
+                            <button type="button" class="btn-toggle-pass" tabindex="-1">👁</button>
+                        </div>
+                        <p id="s-error-password" class="form-error hidden"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="s-confirm">Confirmar Senha</label>
+                        <input type="password" id="s-confirm" placeholder="••••••••" required>
+                        <p id="s-error-confirm" class="form-error hidden"></p>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="btn-signup-submit">
+                        <span class="btn-text">Criar conta</span>
+                        <span class="btn-spinner hidden">⟳</span>
+                    </button>
+                </form>
+                <p class="auth-switch">
+                    Já tem conta? <a href="#" id="go-to-login">Entrar</a>
+                </p>
+            </div>
         </div>
-    </header>
+    </div>
 
-    <main class="container">
-        <!-- Section: PROMPTS -->
-        <section id="section-prompts" class="page-section">
-            <div class="section-header">
-                <div>
-                    <h1>Minha Coleção</h1>
-                    <p id="prompt-counter" class="counter">0 prompts salvos</p>
+    <!-- TELA DE CONFIRMAÇÃO PENDENTE -->
+    <div id="pending-screen" class="screen-overlay hidden">
+        <div class="auth-card text-center">
+            <div class="logo logo-centered">
+                <span class="logo-text">PV</span>
+            </div>
+            <div class="pending-icon">✉️</div>
+            <h2 class="auth-title">Confirme seu email</h2>
+            <p class="pending-text">
+                Enviamos um link de confirmação para <strong id="pending-user-email"></strong>.<br>
+                Acesse seu email e clique no link para ativar sua conta.
+            </p>
+            <button id="btn-resend-email" class="btn btn-secondary btn-full">
+                Reenviar email
+            </button>
+            <p class="auth-switch">
+                <a href="#" id="resend-back-to-login">Voltar para o login</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- APP PRINCIPAL -->
+    <div id="app-interface" class="hidden">
+        <header class="main-header">
+            <div class="container header-content">
+                <div class="logo">
+                    <span class="logo-text">PV</span>
+                    <span class="logo-full">PromptVault</span>
                 </div>
-                <button id="btn-new-prompt" class="btn btn-primary">+ Novo Prompt</button>
-            </div>
-
-            <div id="prompt-filters" class="filters-bar">
-                <!-- Categorias dinâmicas virão aqui -->
-            </div>
-
-            <div id="prompts-grid" class="grid-prompts">
-                <!-- Cards de prompts virão aqui -->
-            </div>
-        </section>
-
-        <!-- Section: ANOTAÇÕES -->
-        <section id="section-anotacoes" class="page-section hidden">
-            <div class="section-header">
-                <div>
-                    <h1>Anotações</h1>
-                    <p id="anotacao-counter" class="counter">0 anotações salvas</p>
+                <nav class="main-nav">
+                    <button id="nav-prompts" class="nav-btn active">PROMPTS</button>
+                    <button id="nav-anotacoes" class="nav-btn">ANOTAÇÕES</button>
+                </nav>
+                <div class="user-menu-container">
+                    <button id="user-avatar" class="avatar">
+                        <span id="user-initial">U</span>
+                    </button>
+                    <div id="user-dropdown" class="user-dropdown hidden">
+                        <div class="dropdown-header">
+                            <p id="dropdown-user-name" class="user-name"></p>
+                            <p id="dropdown-user-email" class="user-email"></p>
+                        </div>
+                        <hr>
+                        <button id="btn-logout" class="dropdown-item danger">
+                            <span>Sair</span>
+                            <span>退出</span>
+                        </button>
+                    </div>
                 </div>
-                <button id="btn-new-anotacao" class="btn btn-primary">+ Nova</button>
             </div>
+        </header>
 
-            <div id="anotacao-filters" class="filters-bar">
-                <!-- Tags dinâmicas virão aqui -->
-            </div>
+        <main class="container">
+            <!-- Section: PROMPTS -->
+            <section id="section-prompts" class="page-section">
+                <div class="section-header">
+                    <div>
+                        <h1>Minha Coleção</h1>
+                        <p id="prompt-counter" class="counter">0 prompts salvos</p>
+                    </div>
+                    <button id="btn-new-prompt" class="btn btn-primary">+ Novo Prompt</button>
+                </div>
 
-            <div id="anotacoes-grid" class="grid-anotacoes">
-                <!-- Cards de anotações virão aqui -->
-            </div>
-        </section>
-    </main>
+                <div id="prompt-filters" class="filters-bar"></div>
 
+                <div id="prompts-grid" class="grid-prompts"></div>
+            </section>
+
+            <!-- Section: ANOTAÇÕES -->
+            <section id="section-anotacoes" class="page-section hidden">
+                <div class="section-header">
+                    <div>
+                        <h1>Anotações</h1>
+                        <p id="anotacao-counter" class="counter">0 anotações salvas</p>
+                    </div>
+                    <button id="btn-new-anotacao" class="btn btn-primary">+ Nova</button>
+                </div>
+
+                <div id="anotacao-filters" class="filters-bar"></div>
+
+                <div id="anotacoes-grid" class="grid-anotacoes"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modais do sistema CRUD -->
     <!-- Modal: Novo/Editar Prompt -->
     <div id="modal-prompt" class="modal">
         <div class="modal-content">
@@ -118,7 +234,7 @@
                     <button type="button" class="btn btn-secondary close-modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary" id="btn-submit-prompt">
                         <span class="btn-text">Criar Prompt</span>
-                        <span class="btn-spinner" style="display:none;">⟳</span>
+                        <span class="btn-spinner hidden">⟳</span>
                     </button>
                 </div>
             </form>
@@ -161,14 +277,14 @@
                     <button type="button" class="btn btn-secondary close-modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary" id="btn-submit-anotacao">
                         <span class="btn-text">Criar</span>
-                        <span class="btn-spinner" style="display:none;">⟳</span>
+                        <span class="btn-spinner hidden">⟳</span>
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Ver Prompt -->
+    <!-- Outros modais customizados... -->
     <div id="modal-view-prompt" class="modal">
         <div class="modal-content modal-large">
             <div class="modal-header-view">
@@ -189,7 +305,7 @@
         </div>
     </div>
 
-    <!-- Modal: Confirmar Deleção (substitui confirm() nativo) -->
+    <!-- Confirm/Input Modals -->
     <div id="modal-confirm" class="modal modal-confirm-overlay">
         <div class="modal-confirm-box">
             <p id="modal-confirm-msg" class="modal-confirm-msg">Tem certeza?</p>
@@ -199,12 +315,10 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal: Input Customizado (substitui prompt() nativo) -->
     <div id="modal-input" class="modal modal-confirm-overlay">
         <div class="modal-confirm-box">
             <p class="modal-confirm-msg" id="modal-input-label">Nome:</p>
-            <input type="text" id="modal-input-field" class="modal-input-field" placeholder="">
+            <input type="text" id="modal-input-field" class="modal-input-field">
             <div class="modal-confirm-actions">
                 <button id="modal-input-cancel" class="btn btn-secondary">Cancelar</button>
                 <button id="modal-input-ok" class="btn btn-primary">Adicionar</button>
@@ -212,7 +326,6 @@
         </div>
     </div>
 
-    <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
     <script type="module" src="/src/main.js"></script>

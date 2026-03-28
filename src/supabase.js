@@ -5,6 +5,41 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// --- AUTH ---
+export async function cadastrarUsuario(email, password, metadata) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: metadata
+    }
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function loginUsuario(email, password) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function logoutUsuario() {
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
+}
+
+export async function reenviarConfirmacao(email) {
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email
+  });
+  if (error) throw error;
+}
+
 // --- PROMPTS ---
 export async function buscarPrompts(categoria = 'TODOS') {
   let query = supabase.from('prompts').select('*').order('created_at', { ascending: false });
@@ -17,7 +52,14 @@ export async function buscarPrompts(categoria = 'TODOS') {
 }
 
 export async function criarPrompt(dados) {
-  const { data, error } = await supabase.from('prompts').insert([dados]).select();
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Usuário não autenticado');
+
+  const { data, error } = await supabase
+    .from('prompts')
+    .insert([{ ...dados, user_id: session.user.id }])
+    .select();
+  
   if (error) throw error;
   return data[0];
 }
@@ -46,7 +88,14 @@ export async function buscarAnotacoes(tag = 'Todos') {
 }
 
 export async function criarAnotacao(dados) {
-  const { data, error } = await supabase.from('anotacoes').insert([dados]).select();
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Usuário não autenticado');
+
+  const { data, error } = await supabase
+    .from('anotacoes')
+    .insert([{ ...dados, user_id: session.user.id }])
+    .select();
+  
   if (error) throw error;
   return data[0];
 }

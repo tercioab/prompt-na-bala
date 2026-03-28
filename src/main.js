@@ -1,11 +1,14 @@
 import { 
     buscarPrompts, criarPrompt, editarPrompt, deletarPrompt, 
     buscarAnotacoes, criarAnotacao, editarAnotacao, deletarAnotacao,
-    uploadImagem
+    uploadImagem, loginUsuario, cadastrarUsuario, logoutUsuario, 
+    reenviarConfirmacao, supabase
 } from './supabase.js';
 
 // ===================== ESTADO =====================
 let state = {
+    user: null,
+    session: null,
     prompts: [],
     anotacoes: [],
     activeTab: 'prompts',
@@ -17,6 +20,36 @@ let state = {
 
 // ===================== SELETORES DOM =====================
 const elements = {
+    // Screens
+    appLoader: document.getElementById('app-loader'),
+    authScreen: document.getElementById('auth-screen'),
+    pendingScreen: document.getElementById('pending-screen'),
+    appInterface: document.getElementById('app-interface'),
+    
+    // Auth Login
+    formLogin: document.getElementById('form-login'),
+    btnLoginSubmit: document.getElementById('btn-login-submit'),
+    lEmail: document.getElementById('l-email'),
+    lPass: document.getElementById('l-password'),
+    lError: document.getElementById('l-error'),
+    
+    // Auth Signup
+    formSignup: document.getElementById('form-signup'),
+    btnSignupSubmit: document.getElementById('btn-signup-submit'),
+    sNome: document.getElementById('s-nome'),
+    sEmail: document.getElementById('s-email'),
+    sPass: document.getElementById('s-password'),
+    sConfirm: document.getElementById('s-confirm'),
+    
+    // User Menu
+    userAvatar: document.getElementById('user-avatar'),
+    userInitial: document.getElementById('user-initial'),
+    userDropdown: document.getElementById('user-dropdown'),
+    dropdownName: document.getElementById('dropdown-user-name'),
+    dropdownEmail: document.getElementById('dropdown-user-email'),
+    btnLogout: document.getElementById('btn-logout'),
+
+    // Navigation & Content
     navPrompts: document.getElementById('nav-prompts'),
     navAnotacoes: document.getElementById('nav-anotacoes'),
     sectionPrompts: document.getElementById('section-prompts'),
@@ -27,6 +60,8 @@ const elements = {
     anotacaoFilters: document.getElementById('anotacao-filters'),
     promptCounter: document.getElementById('prompt-counter'),
     anotacaoCounter: document.getElementById('anotacao-counter'),
+    
+    // Modals
     modalPrompt: document.getElementById('modal-prompt'),
     modalAnotacao: document.getElementById('modal-anotacao'),
     modalViewPrompt: document.getElementById('modal-view-prompt'),
@@ -40,30 +75,102 @@ const elements = {
 // ===================== INICIALIZAÇÃO =====================
 window.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
-    // Mostrar skeletons enquanto dados carregam
+    await initAuth();
+});
+
+async function initAuth() {
+    // Escutar mudanças de estado de auth
+    supabase.auth.onAuthStateChange(async (event, session) => {
+        state.session = session;
+        state.user = session?.user || null;
+        
+        console.log("Auth Event:", event, state.user?.email);
+
+        if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+            if (state.user) {
+                // Verificar se o email foi confirmado
+                if (state.user.identities && state.user.id && !state.user.email_confirmed_at) {
+                   showScreen('pending');
+                } else {
+                    showScreen('app');
+                    await refreshAppData();
+                }
+            } else {
+                showScreen('auth');
+            }
+        } else if (event === 'SIGNED_OUT') {
+            showScreen('auth');
+            resetAppState();
+        }
+    });
+
+    // Verificação inicial forçada caso onAuthStateChange demore
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+        state.session = session;
+        state.user = session.user;
+        if (!state.user.email_confirmed_at) {
+            showScreen('pending');
+        } else {
+            showScreen('app');
+            await refreshAppData();
+        }
+    } else {
+        showScreen('auth');
+    }
+}
+
+function showScreen(screen) {
+    elements.appLoader.classList.add('hidden');
+    elements.authScreen.classList.toggle('hidden', screen !== 'auth');
+    elements.pendingScreen.classList.toggle('hidden', screen !== 'pending');
+    elements.appInterface.classList.toggle('hidden', screen !== 'app');
+    
+    if (screen === 'pending') {
+        document.getElementById('pending-user-email').textContent = state.user?.email || '';
+    }
+    
+    if (screen === 'app' && state.user) {
+        const name = state.user.user_metadata?.nome || state.user.email.split('@')[0];
+        elements.userInitial.textContent = name.charAt(0).toUpperCase();
+        elements.dropdownName.textContent = name;
+        elements.dropdownEmail.textContent = state.user.email;
+    }
+}
+
+async function refreshAppData() {
     renderSkeletons(elements.promptsGrid, 8);
     renderSkeletons(elements.anotacoesGrid, 6);
     await fetchData();
     renderAll();
-});
+}
+
+function resetAppState() {
+    state.prompts = [];
+    state.anotacoes = [];
+    renderAll();
+}
 
 async function fetchData() {
     try {
         state.prompts = await buscarPrompts();
         state.anotacoes = await buscarAnotacoes();
         
+        // Atualizar categorias e tags dinâmicas baseadas nos dados do usuário
         const customCats = state.prompts
             .map(p => p.categoria)
-            .filter(c => c && !state.categories.includes(c));
-        state.categories = [...new Set([...state.categories, ...customCats])];
+            .filter(c => c && !['TODOS', 'ARTE', 'FOTOGRAFIA', 'ESCRITA', 'CÓDIGO', 'MARKETING', 'NEGÓCIOS', 'EDUCAÇÃO'].includes(c));
+        const defaultCats = ['TODOS', 'ARTE', 'FOTOGRAFIA', 'ESCRITA', 'CÓDIGO', 'MARKETING', 'NEGÓCIOS', 'EDUCAÇÃO'];
+        state.categories = [...new Set([...defaultCats, ...customCats])];
 
         const customTags = state.anotacoes
             .map(a => a.tag)
-            .filter(t => t && !state.tags.includes(t));
-        state.tags = [...new Set([...state.tags, ...customTags])];
+            .filter(t => t && !['Todos', 'Ângulos', 'Iluminação', 'Composição', 'Dicas', 'Estilos', 'Câmera', 'links'].includes(t));
+        const defaultTags = ['Todos', 'Ângulos', 'Iluminação', 'Composição', 'Dicas', 'Estilos', 'Câmera', 'links'];
+        state.tags = [...new Set([...defaultTags, ...customTags])];
     } catch (error) {
         console.error("Erro ao carregar dados:", error);
-        showToast('Erro ao carregar dados. Verifique sua conexão.', 'error');
+        showToast('Nenhum dado encontrado ou erro de conexão.', 'info');
     }
 }
 
@@ -80,6 +187,71 @@ function showToast(message, type = 'success') {
         toast.addEventListener('animationend', () => toast.remove(), { once: true });
     };
     setTimeout(remove, 3200);
+}
+
+// ===================== AUTH HANDLERS =====================
+async function handleLogin(e) {
+    e.preventDefault();
+    const email = elements.lEmail.value;
+    const password = elements.lPass.value;
+    
+    elements.lError.classList.add('hidden');
+    setSubmitLoading('btn-login-submit', true, 'Entrando...');
+
+    try {
+        const data = await loginUsuario(email, password);
+        if (data.user && !data.user.email_confirmed_at) {
+            showScreen('pending');
+        }
+    } catch (err) {
+        elements.lError.textContent = 'Credenciais inválidas ou erro de conexão.';
+        elements.lError.classList.remove('hidden');
+        showToast('Falha no login', 'error');
+    } finally {
+        setSubmitLoading('btn-login-submit', false);
+    }
+}
+
+async function handleSignup(e) {
+    e.preventDefault();
+    const nome = elements.sNome.value.trim();
+    const email = elements.sEmail.value.trim();
+    const password = elements.sPass.value;
+    const confirm = elements.sConfirm.value;
+
+    let hasError = false;
+    
+    // Limpar erros
+    document.querySelectorAll('.form-error').forEach(p => p.classList.add('hidden'));
+
+    if (!nome) { showError('s-error-nome', 'Nome é obrigatório'); hasError = true; }
+    if (password.length < 6) { showError('s-error-password', 'Mínimo 6 caracteres'); hasError = true; }
+    if (password !== confirm) { showError('s-error-confirm', 'As senhas não coincidem'); hasError = true; }
+
+    if (hasError) return;
+
+    setSubmitLoading('btn-signup-submit', true, 'Criando conta...');
+
+    try {
+        await cadastrarUsuario(email, password, { nome });
+        showScreen('pending');
+        showToast('Conta criada com sucesso!', 'success');
+    } catch (err) {
+        showToast(err.message, 'error');
+    } finally {
+        setSubmitLoading('btn-signup-submit', false);
+    }
+}
+
+function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.remove('hidden');
+}
+
+function toggleAuthMode(to) {
+    document.getElementById('auth-login').classList.toggle('hidden', to !== 'login');
+    document.getElementById('auth-signup').classList.toggle('hidden', to !== 'signup');
 }
 
 // ===================== MODAL DE CONFIRMAÇÃO =====================
@@ -310,6 +482,59 @@ window.setAnotacaoFilter = (tag) => {
 
 // ===================== EVENT LISTENERS =====================
 function setupEventListeners() {
+    // Auth Mode Toggles
+    document.getElementById('go-to-signup').addEventListener('click', (e) => { e.preventDefault(); toggleAuthMode('signup'); });
+    document.getElementById('go-to-login').addEventListener('click', (e) => { e.preventDefault(); toggleAuthMode('login'); });
+    document.getElementById('resend-back-to-login').addEventListener('click', (e) => { e.preventDefault(); showScreen('auth'); });
+
+    // Auth Submits
+    elements.formLogin.addEventListener('submit', handleLogin);
+    elements.formSignup.addEventListener('submit', handleSignup);
+    elements.btnLogout.addEventListener('click', logoutUsuario);
+
+    // Toggle Pass Visibility
+    document.querySelectorAll('.btn-toggle-pass').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const input = btn.parentElement.querySelector('input');
+            const type = input.type === 'password' ? 'text' : 'password';
+            input.type = type;
+            btn.textContent = type === 'password' ? '👁' : '🔒';
+        });
+    });
+
+    // Resend Email
+    document.getElementById('btn-resend-email').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-resend-email');
+        try {
+            await reenviarConfirmacao(state.user.email);
+            showToast('Email reenviado!', 'info');
+            btn.disabled = true;
+            let count = 60;
+            const timer = setInterval(() => {
+                count--;
+                btn.textContent = `Aguarde ${count}s...`;
+                if (count <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.textContent = 'Reenviar email';
+                }
+            }, 1000);
+        } catch (err) {
+            showToast('Erro ao reenviar email', 'error');
+        }
+    });
+
+    // Avatar Dropdown
+    elements.userAvatar.addEventListener('click', (e) => {
+        e.stopPropagation();
+        elements.userDropdown.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', () => {
+        elements.userDropdown.classList.add('hidden');
+    });
+
+    // Navigation
     elements.navPrompts.addEventListener('click', () => switchTab('prompts'));
     elements.navAnotacoes.addEventListener('click', () => switchTab('anotacoes'));
 
@@ -317,7 +542,7 @@ function setupEventListeners() {
     elements.btnNewAnotacao.addEventListener('click', () => openModal('anotacao'));
 
     // Fechar modal ao clicar no backdrop
-    [elements.modalPrompt, elements.modalAnotacao, elements.modalViewPrompt].forEach(modal => {
+    [elements.modalPrompt, elements.modalAnotacao, elements.modalViewPrompt, elements.modalConfirm, elements.modalInput].forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeModal();
         });
@@ -333,11 +558,11 @@ function setupEventListeners() {
         btn.addEventListener('click', closeModal);
     });
 
-    // Submits
+    // CRUD Submits
     document.getElementById('form-prompt').addEventListener('submit', handlePromptSubmit);
     document.getElementById('form-anotacao').addEventListener('submit', handleAnotacaoSubmit);
 
-    // Adicionar Categorias/Tags (sem prompt() nativo)
+    // Adicionar Categorias/Tags
     document.getElementById('btn-add-cat').addEventListener('click', async () => {
         const newCat = await showInputModal('Nova Categoria:', 'Ex: ARQUITETURA');
         if (newCat && !state.categories.includes(newCat.toUpperCase())) {
@@ -362,7 +587,7 @@ function setupEventListeners() {
         }
     });
 
-    // Seleção de arquivo — feedback visual
+    // Seleção de arquivo feedback
     const fileInput = document.getElementById('p-imagem-file');
     const fileChosen = document.getElementById('file-chosen');
     if (fileInput) {
@@ -373,7 +598,7 @@ function setupEventListeners() {
         });
     }
 
-    // Botão copiar no modal de visualização
+    // Botão copiar view modal
     document.getElementById('btn-copy-prompt').addEventListener('click', async () => {
         const content = document.getElementById('view-content').innerText;
         const btn = document.getElementById('btn-copy-prompt');
@@ -387,7 +612,7 @@ function setupEventListeners() {
                 btn.classList.remove('copied');
             }, 2200);
         } catch {
-            showToast('Erro ao copiar. Tente manualmente.', 'error');
+            showToast('Erro ao copiar.', 'error');
         }
     });
 }
@@ -444,10 +669,10 @@ function openModal(type, data = null) {
 }
 
 function closeModal() {
-    const modals = [elements.modalPrompt, elements.modalAnotacao, elements.modalViewPrompt];
+    const modals = [elements.modalPrompt, elements.modalAnotacao, elements.modalViewPrompt, elements.modalConfirm, elements.modalInput];
     modals.forEach(modal => {
         if (modal.classList.contains('active')) {
-            const content = modal.querySelector('.modal-content');
+            const content = modal.querySelector('.modal-content') || modal.querySelector('.modal-confirm-box');
             if (content) {
                 content.classList.add('closing');
                 const remove = () => {
@@ -455,18 +680,13 @@ function closeModal() {
                     content.classList.remove('closing');
                 };
                 content.addEventListener('animationend', remove, { once: true });
-                // Fallback caso animação não dispare
-                setTimeout(() => {
-                    modal.classList.remove('active');
-                    content.classList.remove('closing');
-                }, 250);
+                setTimeout(remove, 250);
             } else {
                 modal.classList.remove('active');
             }
         }
     });
 
-    // Reset file chooser
     const fileChosen = document.getElementById('file-chosen');
     if (fileChosen) fileChosen.textContent = 'Nenhum arquivo selecionado';
     const fileInput = document.getElementById('p-imagem-file');
@@ -480,8 +700,15 @@ function setSubmitLoading(btnId, loading, loadingText = 'Processando...') {
     const textEl = btn.querySelector('.btn-text');
     const spinEl = btn.querySelector('.btn-spinner');
     btn.disabled = loading;
-    if (textEl) textEl.textContent = loading ? loadingText : btn.dataset.originalText || textEl.textContent;
-    if (spinEl) spinEl.style.display = loading ? 'inline' : 'none';
+    if (textEl) {
+        if (loading) {
+            if (!btn.dataset.originalText) btn.dataset.originalText = textEl.textContent;
+            textEl.textContent = loadingText;
+        } else {
+            textEl.textContent = btn.dataset.originalText || textEl.textContent;
+        }
+    }
+    if (spinEl) spinEl.classList.toggle('hidden', !loading);
 }
 
 function showFormError(containerId, message) {
@@ -522,8 +749,7 @@ async function handlePromptSubmit(e) {
         };
 
         if (isEdit) {
-            const updated = await editarPrompt(id, dados);
-            // Atualizar apenas o card afetado no DOM
+            await editarPrompt(id, dados);
             const idx = state.prompts.findIndex(p => p.id === id);
             if (idx !== -1) state.prompts[idx] = { ...state.prompts[idx], ...dados };
             const existingCard = document.getElementById(`card-${id}`);
@@ -531,15 +757,13 @@ async function handlePromptSubmit(e) {
                 const newCard = buildPromptCard(state.prompts[idx], true);
                 existingCard.replaceWith(newCard);
             }
-            showToast('Prompt atualizado com sucesso!', 'success');
+            showToast('Prompt atualizado!', 'success');
         } else {
             const created = await criarPrompt(dados);
             state.prompts.unshift(created);
-            // Adicionar card no topo do grid com animação
             if (state.promptFilter === 'TODOS' || state.promptFilter === dados.categoria) {
                 const newCard = buildPromptCard(created, true);
                 elements.promptsGrid.prepend(newCard);
-                // Remover empty state se existia
                 const empty = elements.promptsGrid.querySelector('.empty-state');
                 if (empty) empty.remove();
             }
@@ -547,7 +771,7 @@ async function handlePromptSubmit(e) {
         }
 
         updateCounters();
-        renderFilters(); // Atualiza contagens e categorias
+        renderFilters();
         closeModal();
     } catch (err) {
         showFormError('prompt-error-msg', 'Erro ao salvar: ' + err.message);
@@ -606,7 +830,7 @@ async function handleAnotacaoSubmit(e) {
     }
 }
 
-// ===================== COPIAR PROMPT =====================
+// ===================== COMPLEMENTOS CRUD =====================
 window.copyPrompt = async (id) => {
     const promptObj = state.prompts.find(p => p.id === id);
     if (promptObj) {
@@ -624,7 +848,6 @@ window.copyPrompt = async (id) => {
     }
 };
 
-// ===================== DELETE =====================
 window.deletePromptHandler = async (id) => {
     const confirmed = await showConfirm('Deseja realmente excluir este prompt?');
     if (!confirmed) return;
@@ -642,17 +865,7 @@ window.deletePromptHandler = async (id) => {
         updateCounters();
         renderFilters();
         showToast('Prompt excluído.', 'info');
-
-        // Mostrar empty state se grid ficou vazio
-        const visibleCards = elements.promptsGrid.querySelectorAll('.card');
-        if (visibleCards.length === 0) {
-            elements.promptsGrid.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">🗂</div>
-                    <p class="empty-state-title">Nenhum prompt aqui</p>
-                    <p class="empty-state-sub">Adicione um novo prompt clicando em "+ Novo Prompt".</p>
-                </div>`;
-        }
+        if (elements.promptsGrid.querySelectorAll('.card').length === 0) renderPromptsGrid();
     } catch (err) {
         showToast('Erro ao excluir prompt.', 'error');
         if (card) card.classList.remove('card-exiting');
@@ -676,23 +889,13 @@ window.deleteAnotacaoHandler = async (id) => {
         updateCounters();
         renderFilters();
         showToast('Anotação excluída.', 'info');
-
-        const visibleCards = elements.anotacoesGrid.querySelectorAll('.card');
-        if (visibleCards.length === 0) {
-            elements.anotacoesGrid.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">📝</div>
-                    <p class="empty-state-title">Nenhuma anotação aqui</p>
-                    <p class="empty-state-sub">Crie uma nova anotação clicando em "+ Nova".</p>
-                </div>`;
-        }
+        if (elements.anotacoesGrid.querySelectorAll('.card').length === 0) renderAnotacoesGrid();
     } catch (err) {
         showToast('Erro ao excluir anotação.', 'error');
         if (card) card.classList.remove('card-exiting');
     }
 };
 
-// ===================== EDITAR =====================
 window.editPrompt = (id) => {
     const promptObj = state.prompts.find(p => p.id === id);
     if (promptObj) openModal('prompt', promptObj);
@@ -703,7 +906,6 @@ window.editAnotacao = (id) => {
     if (nota) openModal('anotacao', nota);
 };
 
-// ===================== VER PROMPT =====================
 window.viewPrompt = (id) => {
     const promptObj = state.prompts.find(p => p.id === id);
     if (!promptObj) return;
@@ -713,7 +915,6 @@ window.viewPrompt = (id) => {
     document.getElementById('view-description').innerText = promptObj.descricao || '';
     document.getElementById('view-content').innerText = promptObj.prompt;
 
-    // Reset botão copiar
     const copyBtn = document.getElementById('btn-copy-prompt');
     copyBtn.textContent = 'Copiar Prompt';
     copyBtn.classList.remove('copied');
