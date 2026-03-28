@@ -248,10 +248,9 @@ function openModal(type, data = null) {
         document.getElementById('anotacao-id').value = data ? data.id : '';
         document.getElementById('anotacao-modal-title').innerText = data ? 'Editar Anotação' : 'Nova Anotação';
         if (data) {
-            document.getElementById('a-titulo').value = data.titulo;
-            document.getElementById('a-tag').value = data.tag;
-            document.getElementById('a-conteudo').value = data.conteudo;
-            document.getElementById('a-imagem-url').value = data.imagem_url || '';
+            document.getElementById('a-titulo').value = data.titulo || '';
+            document.getElementById('a-tag').value = data.tag || 'Dicas';
+            document.getElementById('a-conteudo').value = data.conteudo || '';
             form.querySelector('button[type="submit"]').innerText = 'Salvar Alterações';
         } else {
             form.querySelector('button[type="submit"]').innerText = 'Criar';
@@ -298,8 +297,7 @@ async function handleAnotacaoSubmit(e) {
     const dados = {
         titulo: document.getElementById('a-titulo').value,
         tag: document.getElementById('a-tag').value,
-        conteudo: document.getElementById('a-conteudo').value,
-        imagem_url: document.getElementById('a-imagem-url').value
+        conteudo: document.getElementById('a-conteudo').value
     };
 
     try {
