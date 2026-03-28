@@ -95,7 +95,7 @@ function renderPromptsGrid() {
         : state.prompts.filter(p => p.categoria === state.promptFilter);
 
     elements.promptsGrid.innerHTML = filtered.map(prompt => `
-        <div class="card" onclick="window.viewPrompt('${prompt.id}')">
+        <div class="card" id="card-${prompt.id}" onclick="window.copyPrompt('${prompt.id}')">
             <div class="card-image">
                 ${prompt.imagem_url 
                     ? `<img src="${prompt.imagem_url}" onerror="this.src=''; this.parentElement.innerHTML='<span class=\'card-fallback\'>Sem Imagem</span>'">` 
@@ -104,12 +104,14 @@ function renderPromptsGrid() {
             <div class="card-content">
                 <span class="card-badge">${prompt.categoria || 'GERAL'}</span>
                 <h3 class="card-title">${prompt.titulo}</h3>
-                <p class="card-desc">${prompt.descricao || ''}</p>
+                <p class="card-desc">${prompt.descricao || ''} <span class="copy-hint">(Clique p/ copiar)</span></p>
             </div>
             <div class="card-actions">
+                <button class="btn-action" onclick="event.stopPropagation(); window.viewPrompt('${prompt.id}')">👁</button>
                 <button class="btn-action" onclick="event.stopPropagation(); window.editPrompt('${prompt.id}')">✎</button>
                 <button class="btn-action" onclick="event.stopPropagation(); window.deletePromptHandler('${prompt.id}')">×</button>
             </div>
+            <div class="copy-overlay">Copiado!</div>
         </div>
     `).join('');
 }
@@ -313,6 +315,22 @@ async function handleAnotacaoSubmit(e) {
         alert("Erro ao salvar anotação: " + err.message);
     }
 }
+
+window.copyPrompt = async (id) => {
+    const promptObj = state.prompts.find(p => p.id === id);
+    if (promptObj) {
+        try {
+            await navigator.clipboard.writeText(promptObj.prompt);
+            const card = document.getElementById(`card-${id}`);
+            if (card) {
+                card.classList.add('copied');
+                setTimeout(() => card.classList.remove('copied'), 1500);
+            }
+        } catch (err) {
+            console.error("Erro ao copiar:", err);
+        }
+    }
+};
 
 window.deletePromptHandler = async (id) => {
     if (confirm("Deseja realmente excluir este prompt?")) {
