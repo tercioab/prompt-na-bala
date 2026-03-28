@@ -70,6 +70,10 @@ const elements = {
     btnNewPrompt: document.getElementById('btn-new-prompt'),
     btnNewAnotacao: document.getElementById('btn-new-anotacao'),
     toastContainer: document.getElementById('toast-container'),
+    
+    // Selects
+    categorySelect: document.getElementById('p-categoria'),
+    tagSelect: document.getElementById('a-tag'),
 };
 
 // ===================== INICIALIZAÇÃO =====================
@@ -138,6 +142,9 @@ function showScreen(screen) {
         elements.userInitial.textContent = name.charAt(0).toUpperCase();
         elements.dropdownName.textContent = name;
         elements.dropdownEmail.textContent = state.user.email;
+        
+        // Initialize nav indicator after layout
+        setTimeout(() => switchTab(state.activeTab || 'prompts'), 100);
     }
 }
 
@@ -354,14 +361,17 @@ function renderSkeletons(grid, count) {
     const fragment = document.createDocumentFragment();
     for (let i = 0; i < count; i++) {
         const el = document.createElement('div');
-        el.className = 'glass-panel rounded-3xl p-6 aspect-[4/5] overflow-hidden';
+        el.className = 'glass-panel rounded-[2.5rem] p-6 aspect-[4/5] overflow-hidden border border-white/5';
         el.innerHTML = `
-            <div class="skeleton-shimmer h-full flex flex-col gap-4">
-                <div class="h-1/2 bg-white/5 rounded-2xl"></div>
-                <div class="space-y-3 p-2">
-                    <div class="h-4 bg-white/10 rounded w-1/4"></div>
-                    <div class="h-6 bg-white/10 rounded w-3/4"></div>
-                    <div class="h-4 bg-white/10 rounded w-full"></div>
+            <div class="h-full flex flex-col gap-6">
+                <div class="h-1/2 skeleton-box rounded-3xl"></div>
+                <div class="space-y-4 px-2">
+                    <div class="h-3 skeleton-box w-1/4 opacity-50"></div>
+                    <div class="h-7 skeleton-box w-3/4"></div>
+                    <div class="space-y-2">
+                        <div class="h-3 skeleton-box w-full opacity-30"></div>
+                        <div class="h-3 skeleton-box w-5/6 opacity-30"></div>
+                    </div>
                 </div>
             </div>`;
         fragment.appendChild(el);
@@ -395,19 +405,33 @@ function renderFilters() {
             : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10 hover:border-white/10'}
     `;
 
-    elements.promptFilters.innerHTML = state.categories.map(cat => `
-        <button class="${filterBtnClass(state.promptFilter === cat)}" 
-                onclick="window.setPromptFilter('${cat}')">
-            ${cat}
-        </button>
-    `).join('');
+    if (elements.promptFilters) {
+        elements.promptFilters.innerHTML = state.categories.map(cat => `
+            <button class="${filterBtnClass(state.promptFilter === cat)}" 
+                    onclick="window.setPromptFilter('${cat}')">
+                ${cat}
+            </button>
+        `).join('');
+    }
 
-    elements.anotacaoFilters.innerHTML = state.tags.map(tag => `
-        <button class="${noteFilterBtnClass(state.anotacaoFilter === tag)}" 
-                onclick="window.setAnotacaoFilter('${tag}')">
-            ${tag.toUpperCase()}
-        </button>
-    `).join('');
+    if (elements.anotacaoFilters) {
+        elements.anotacaoFilters.innerHTML = state.tags.map(tag => `
+            <button class="${noteFilterBtnClass(state.anotacaoFilter === tag)}" 
+                    onclick="window.setAnotacaoFilter('${tag}')">
+                ${tag.toUpperCase()}
+            </button>
+        `).join('');
+    }
+
+    // Populate Modals Selects
+    if (elements.categorySelect) {
+        const cats = state.categories.filter(c => c !== 'TODOS');
+        elements.categorySelect.innerHTML = cats.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+    }
+    if (elements.tagSelect) {
+        const tags = state.tags.filter(t => t !== 'Todos');
+        elements.tagSelect.innerHTML = tags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
+    }
 }
 
 function buildPromptCard(prompt, animate = false) {
@@ -424,9 +448,9 @@ function buildPromptCard(prompt, animate = false) {
     div.innerHTML = `
         <div class="relative h-64 overflow-hidden border-b border-white/5">
             ${imgHtml}
-            <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-60"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#030303] via-transparent to-transparent opacity-80"></div>
             <div class="absolute top-6 left-6">
-                <span class="px-3 py-1 bg-primary/20 backdrop-blur-md border border-primary/30 rounded-lg text-[10px] font-bold text-primary tracking-widest uppercase">
+                <span class="px-3 py-1 bg-white/10 backdrop-blur-md border border-white/10 rounded-lg text-[9px] font-black text-white/70 tracking-widest uppercase">
                     ${prompt.categoria || 'GERAL'}
                 </span>
             </div>
@@ -444,20 +468,20 @@ function buildPromptCard(prompt, animate = false) {
         </div>
         
         <div class="p-8 flex flex-col flex-1 cursor-pointer" onclick="window.copyPrompt('${prompt.id}')">
-            <h3 class="text-xl font-manrope font-extrabold tracking-tight text-white mb-2 group-hover/card:text-primary transition-colors">${prompt.titulo}</h3>
-            <p class="text-gray-500 text-sm line-clamp-2 leading-relaxed mb-6 flex-1">${prompt.descricao || ''}</p>
+            <h3 class="text-xl font-manrope font-extrabold tracking-tight text-white mb-2 group-hover/card:text-primary transition-colors duration-300 leading-tight">${prompt.titulo}</h3>
+            <p class="text-white/40 text-sm font-medium line-clamp-2 leading-relaxed mb-6 flex-1">${prompt.descricao || ''}</p>
             
-            <div class="flex items-center justify-between pt-4 border-t border-white/5">
-                <span class="text-[10px] font-mono text-gray-600 uppercase tracking-widest">Clique para copiar</span>
-                <i data-lucide="copy" class="w-4 h-4 text-gray-600 group-hover/card:text-primary transition-colors"></i>
+            <div class="flex items-center justify-between pt-5 border-t border-white/5">
+                <span class="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]">Toque para copiar</span>
+                <i data-lucide="copy" class="w-4 h-4 text-white/20 group-hover/card:text-primary transition-colors"></i>
             </div>
         </div>
         
-        <div id="copy-overlay-${prompt.id}" class="absolute inset-0 bg-primary/90 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-300 z-20">
-            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-2xl">
-                <i data-lucide="check" class="w-8 h-8 text-primary"></i>
+        <div id="copy-overlay-${prompt.id}" class="absolute inset-0 bg-primary/95 backdrop-blur-md flex flex-col items-center justify-center opacity-0 scale-110 pointer-events-none transition-all duration-500 z-50">
+            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-2xl animate-pop text-primary">
+                <i data-lucide="check" class="w-8 h-8"></i>
             </div>
-            <span class="text-white font-manrope font-black text-2xl tracking-tighter">COPIADO!</span>
+            <span class="text-white font-manrope font-black text-2xl tracking-tighter">PRONTO!</span>
         </div>
     `;
     return div;
@@ -469,31 +493,31 @@ function buildNotaCard(nota, animate = false) {
     div.id = `card-nota-${nota.id}`;
 
     div.innerHTML = `
-        <div class="flex items-center justify-between mb-6">
-            <span class="px-3 py-1 bg-secondary/10 border border-secondary/20 rounded-lg text-[10px] font-bold text-secondary tracking-widest uppercase">
-                ${nota.tag || 'DICAS'}
+        <div class="flex items-center justify-between mb-8">
+            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[9px] font-black text-white/50 tracking-widest uppercase">
+                ${nota.tag || 'GERAL'}
             </span>
-            <div class="flex gap-2 opacity-0 group-hover/nota:opacity-100 transition-opacity">
-                <button onclick="event.stopPropagation(); window.editAnotacao('${nota.id}')" class="text-gray-500 hover:text-white transition-colors">
-                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+            <div class="flex gap-2 opacity-0 group-hover/nota:opacity-100 transition-all duration-300">
+                <button onclick="event.stopPropagation(); window.editAnotacao('${nota.id}')" class="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white hover:bg-white/5 transition-all">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                 </button>
-                <button onclick="event.stopPropagation(); window.deleteAnotacaoHandler('${nota.id}')" class="text-gray-500 hover:text-red-400 transition-colors">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <button onclick="event.stopPropagation(); window.deleteAnotacaoHandler('${nota.id}')" class="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-red-400 hover:bg-white/5 transition-all">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                 </button>
             </div>
         </div>
         
-        <h3 class="text-lg font-manrope font-extrabold text-white mb-4 tracking-tight group-hover/nota:text-secondary transition-colors underline decoration-secondary/30 decoration-2 underline-offset-4">
+        <h3 class="text-lg font-manrope font-extrabold text-white mb-5 tracking-tight group-hover/nota:text-secondary transition-colors underline decoration-secondary/10 decoration-2 underline-offset-8">
             ${nota.titulo || 'Sem Título'}
         </h3>
         
-        <div class="text-gray-400 text-sm leading-relaxed overflow-hidden flex-1" style="display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical;">
+        <div class="text-white/50 text-sm font-medium leading-relaxed overflow-hidden flex-1" style="display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical;">
             ${formatContent(nota.conteudo)}
         </div>
         
-        <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-600 uppercase tracking-widest">
-            <span>Nota rápida</span>
-            <i data-lucide="file-text" class="w-3 h-3"></i>
+        <div class="mt-8 pt-5 border-t border-white/5 flex items-center justify-between text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]">
+            <span>Anotação Rápida</span>
+            <i data-lucide="file-text" class="w-4 h-4"></i>
         </div>
     `;
     return div;
@@ -508,11 +532,15 @@ function renderPromptsGrid() {
 
     if (filtered.length === 0) {
         elements.promptsGrid.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">🗂</div>
-                <p class="empty-state-title">Nenhum prompt aqui</p>
-                <p class="empty-state-sub">Tente outro filtro ou adicione um novo prompt.</p>
+            <div class="col-span-full py-20 flex flex-col items-center justify-center text-center animate-fade-in">
+                <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 text-gray-600">
+                    <i data-lucide="layout-grid" class="w-10 h-10"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Sua galeria está vazia</h3>
+                <p class="text-gray-500 text-sm mb-8 max-w-xs">Nenhum prompt encontrado para esta categoria. Que tal criar o seu primeiro?</p>
+                <button onclick="openModal('prompt')" class="px-8 py-3 bg-white/5 border border-white/10 rounded-2xl text-xs font-bold tracking-widest hover:bg-white/10 transition-all">CRIAR NOVO PROMPT</button>
             </div>`;
+        lucide.createIcons({ root: elements.promptsGrid });
         return;
     }
 
@@ -535,11 +563,15 @@ function renderAnotacoesGrid() {
 
     if (filtered.length === 0) {
         elements.anotacoesGrid.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">📝</div>
-                <p class="empty-state-title">Nenhuma anotação aqui</p>
-                <p class="empty-state-sub">Tente outra tag ou crie uma nova anotação.</p>
+            <div class="col-span-full py-20 flex flex-col items-center justify-center text-center animate-fade-in">
+                <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 text-gray-600">
+                    <i data-lucide="edit-3" class="w-10 h-10"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Nada por aqui ainda</h3>
+                <p class="text-gray-500 text-sm mb-8 max-w-xs">Suas notas e ideias aparecerão aqui. Comece a capturar seus pensamentos!</p>
+                <button onclick="openModal('anotacao')" class="px-8 py-3 bg-white/5 border border-white/10 rounded-2xl text-xs font-bold tracking-widest hover:bg-white/10 transition-all">CRIAR ANOTAÇÃO</button>
             </div>`;
+        lucide.createIcons({ root: elements.anotacoesGrid });
         return;
     }
 
@@ -704,28 +736,63 @@ function setupEventListeners() {
         const btn = document.getElementById('btn-copy-prompt');
         try {
             await navigator.clipboard.writeText(content);
-            btn.textContent = 'Copiado ✓';
-            btn.classList.add('copied');
-            showToast('Copiado para a área de transferência!', 'info');
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>Copiado!</span>';
+            btn.classList.add('bg-green-500/20', 'text-green-400', 'border-green-500/30');
+            lucide.createIcons({ root: btn });
+            showToast('Copiado com sucesso!', 'success');
             setTimeout(() => {
-                btn.textContent = 'Copiar Prompt';
-                btn.classList.remove('copied');
-            }, 2200);
+                btn.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i><span>Copiar Prompt</span>';
+                btn.classList.remove('bg-green-500/20', 'text-green-400', 'border-green-500/30');
+                lucide.createIcons({ root: btn });
+            }, 2000);
         } catch {
             showToast('Erro ao copiar.', 'error');
         }
     });
+
+    // FAB Logic
+    const fabBtn = document.getElementById('fab-main');
+    if (fabBtn) {
+        fabBtn.addEventListener('click', () => {
+            if (state.activeTab === 'prompts') openModal('prompt');
+            else openModal('anotacao');
+        });
+    }
 }
 
 // ===================== NAVEGAÇÃO =====================
 function switchTab(tab) {
-    state.activeTab = tab;
-    if (elements.navPrompts) elements.navPrompts.classList.toggle('active', tab === 'prompts');
-    if (elements.navAnotacoes) elements.navAnotacoes.classList.toggle('active', tab === 'anotacoes');
-    if (elements.sectionPrompts) elements.sectionPrompts.classList.toggle('hidden', tab !== 'prompts');
-    if (elements.sectionAnotacoes) elements.sectionAnotacoes.classList.toggle('hidden', tab !== 'anotacoes');
+    if (state.activeTab === tab && elements.sectionPrompts.classList.contains('animate-fade-in')) return;
     
-    // Smooth scroll to top when switching
+    const oldSection = state.activeTab === 'prompts' ? elements.sectionPrompts : elements.sectionAnotacoes;
+    const newSection = tab === 'prompts' ? elements.sectionPrompts : elements.sectionAnotacoes;
+    
+    state.activeTab = tab;
+    const tabPrompts = elements.navPrompts;
+    const tabAnotacoes = elements.navAnotacoes;
+    const indicator = document.getElementById('nav-indicator');
+
+    if (tabPrompts) tabPrompts.classList.toggle('active', tab === 'prompts');
+    if (tabAnotacoes) tabAnotacoes.classList.toggle('active', tab === 'anotacoes');
+    
+    // Update indicator position
+    const activeBtn = tab === 'prompts' ? tabPrompts : tabAnotacoes;
+    if (activeBtn && indicator) {
+        indicator.style.width = `${activeBtn.offsetWidth - 64}px`;
+        indicator.style.left = `${activeBtn.offsetLeft + 32}px`;
+    }
+
+    // Animação de troca de conteúdo
+    if (oldSection) {
+        oldSection.classList.add('hidden');
+        oldSection.classList.remove('animate-fade-slide');
+    }
+    
+    if (newSection) {
+        newSection.classList.remove('hidden');
+        newSection.classList.add('animate-fade-slide');
+    }
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -833,8 +900,11 @@ function setSubmitLoading(btnId, loading, loadingText = 'Processando...') {
 function showFormError(containerId, message) {
     const container = document.getElementById(containerId);
     if (!container) return;
+    container.classList.remove('hidden');
     container.style.display = 'block';
-    container.querySelector('.form-error').textContent = message;
+    
+    const errorEl = container.querySelector('.form-error') || container;
+    if (errorEl) errorEl.textContent = message;
 }
 
 function hideFormError(containerId) {
@@ -957,11 +1027,11 @@ window.copyPrompt = async (id) => {
             await navigator.clipboard.writeText(promptObj.prompt);
             const overlay = document.getElementById(`copy-overlay-${id}`);
             if (overlay) {
-                overlay.style.opacity = '1';
-                overlay.style.pointerEvents = 'auto';
+                overlay.classList.remove('opacity-0', 'scale-110', 'pointer-events-none');
+                overlay.classList.add('opacity-100', 'scale-100', 'pointer-events-auto');
                 setTimeout(() => {
-                    overlay.style.opacity = '0';
-                    overlay.style.pointerEvents = 'none';
+                    overlay.classList.add('opacity-0', 'scale-110', 'pointer-events-none');
+                    overlay.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
                 }, 1600);
             }
             showToast('Copiado para a área de transferência!', 'success');
@@ -977,8 +1047,8 @@ window.deletePromptHandler = async (id) => {
 
     const card = document.getElementById(`card-${id}`);
     if (card) {
-        card.classList.add('card-exiting');
-        await new Promise(resolve => setTimeout(resolve, 220));
+        card.classList.add('card-collapsing');
+        await new Promise(resolve => setTimeout(resolve, 500));
     }
 
     try {
@@ -1001,8 +1071,8 @@ window.deleteAnotacaoHandler = async (id) => {
 
     const card = document.getElementById(`card-nota-${id}`);
     if (card) {
-        card.classList.add('card-exiting');
-        await new Promise(resolve => setTimeout(resolve, 220));
+        card.classList.add('card-collapsing');
+        await new Promise(resolve => setTimeout(resolve, 500));
     }
 
     try {

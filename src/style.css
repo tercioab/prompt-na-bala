@@ -1,39 +1,113 @@
+@property --gradient-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+    html {
+        scroll-behavior: smooth;
+    }
     body {
-        @apply bg-[#030303] text-white selection:bg-primary/30 selection:text-white;
+        background-color: #030303;
+        color: white;
         font-family: 'Inter', sans-serif;
         overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
     }
 }
 
 @layer components {
     .glass-panel {
-        @apply bg-[rgba(15,15,15,0.7)] backdrop-blur-xl border border-white/5;
+        background: rgba(15, 15, 15, 0.7);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .glow-card {
-        @apply glass-panel transition-all duration-500 hover:border-primary/30 hover:shadow-[0_0_30px_rgba(239,35,60,0.15)];
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    /* Shiny CTA - Premium Button Style */
+    .glow-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(239, 35, 60, 0.3);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(239, 35, 60, 0.1);
+    }
+
+    .card-collapsing {
+        max-height: 0 !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        opacity: 0 !important;
+        transform: scale(0.95) translateY(10px) !important;
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1) !important;
+        pointer-events: none;
+    }
+
+    /* Shiny CTA - Premium Button Style 1:1 Design System */
     .shiny-cta {
-        @apply relative overflow-hidden rounded-full font-bold cursor-pointer transition-all duration-300 inline-flex items-center justify-center min-h-[56px] border border-white/10;
-        background: radial-gradient(65% 65% at 50% 100%, rgba(239, 35, 60, 0.4) 0%, rgba(255, 55, 0, 0.9) 100%), #f75103;
+        position: relative;
+        overflow: hidden;
+        border-radius: 9999px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 50px;
+        border: 0px solid rgba(255, 255, 255, 0.1);
+        background: #030303;
         isolation: isolate;
+        --gradient-angle: 0deg;
+    }
+
+    .shiny-cta:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 10px 40px rgba(255, 98, 0, 0.4);
     }
 
     .btn-aura-border {
-        @apply absolute inset-0 pointer-events-none overflow-hidden z-0 rounded-full;
+        @apply absolute inset-0 pointer-events-none overflow-hidden z-0 rounded-full border border-transparent transition-colors duration-300;
+    }
+
+    .shiny-cta:hover .btn-aura-border {
+        border-color: rgba(255, 255, 255, 0.3);
     }
 
     .aura-spinner {
-        @apply absolute inset-[-250%] animate-spin;
-        background: conic-gradient(from 90deg at 50% 50%, transparent 0%, transparent 90%, rgba(239, 35, 60, 1) 100%);
-        animation-duration: 5s;
+        position: absolute;
+        inset: -250%;
+        background: conic-gradient(from var(--gradient-angle),
+                transparent 0%,
+                transparent 85%,
+                rgba(255, 55, 0, 1) 95%,
+                rgba(255, 255, 255, 1) 100%);
+        animation: border-spin 3s linear infinite;
+    }
+
+    @keyframes border-spin {
+        to {
+            --gradient-angle: 360deg;
+        }
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
     }
 
     .btn-aura-inner {
@@ -42,66 +116,315 @@
     }
 
     .btn-content {
-        @apply relative z-10 flex items-center justify-center gap-2 px-8 py-2 text-white;
+        position: relative;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem 2rem;
+        color: white;
+        width: 100%;
+        height: 100%;
     }
 
     .btn-aura-glow {
-        @apply absolute inset-0 rounded-full pointer-events-none z-0 transition-opacity duration-700 opacity-0;
+        @apply absolute inset-0 rounded-full pointer-events-none z-0 transition-opacity duration-700;
     }
 
     .btn-aura-glow-default {
-        background: radial-gradient(60% 60% at 50% 100%, rgba(239, 35, 60, 0.6) 0%, transparent 100%);
-        @apply opacity-100;
+        background: radial-gradient(20% 50% at 50% 100%, rgba(239, 35, 60, 0.5) 0%, rgba(239, 35, 60, 0) 100%);
+        filter: blur(10px);
+        opacity: 1;
     }
 
-    /* Particles inside button */
+    .btn-aura-glow-hover {
+        background: radial-gradient(60% 50% at 50% 100%, rgba(239, 35, 60, 0.7) 0%, rgba(239, 35, 60, 0) 100%);
+        filter: blur(20px);
+        opacity: 0;
+    }
+
+    .shiny-cta:hover .btn-aura-glow-default {
+        opacity: 0.3;
+    }
+
+    .shiny-cta:hover .btn-aura-glow-hover {
+        opacity: 1;
+    }
+
+    /* Particles System 1:1 */
     .points_wrapper {
-        @apply absolute inset-0 overflow-hidden pointer-events-none z-0;
+        @apply absolute inset-0 overflow-hidden pointer-events-none z-[1];
     }
 
     .point {
-        @apply absolute w-[2px] h-[2px] bg-white rounded-full opacity-0;
-        animation: particle-up 3s ease-out infinite;
+        @apply absolute bottom-[-5px] w-[2px] h-[2px] bg-white rounded-full opacity-0;
+        animation: particleUp 2s infinite ease-in;
+        transition: animation-duration 0.3s ease;
     }
 
-    @keyframes particle-up {
-        0% { transform: translateY(100%) scale(0); opacity: 0; }
-        20% { opacity: 0.8; }
-        100% { transform: translateY(-200%) scale(1.5); opacity: 0; }
+    .shiny-cta:hover .point {
+        animation-duration: 0.75s !important;
+    }
+
+    .point:nth-child(1) {
+        left: 10%;
+        animation-duration: 2.35s;
+        animation-delay: 0.2s;
+    }
+
+    .point:nth-child(2) {
+        left: 30%;
+        animation-duration: 2.5s;
+        animation-delay: 0.5s;
+    }
+
+    .point:nth-child(3) {
+        left: 25%;
+        animation-duration: 2.2s;
+        animation-delay: 0.1s;
+    }
+
+    .point:nth-child(4) {
+        left: 44%;
+        animation-duration: 2.05s;
+    }
+
+    .point:nth-child(5) {
+        left: 50%;
+        animation-duration: 1.9s;
+    }
+
+    .point:nth-child(6) {
+        left: 75%;
+        animation-duration: 1.5s;
+        animation-delay: 1.5s;
+    }
+
+    .point:nth-child(7) {
+        left: 88%;
+        animation-duration: 2.2s;
+        animation-delay: 0.2s;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* Floating Labels Logic */
+    .field-group {
+        position: relative;
+        width: 100%;
+    }
+
+    .field-group label {
+        position: absolute;
+        left: 24px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 14px;
+        font-weight: 600;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        background: transparent;
+        padding: 0 4px;
+    }
+
+    .field-group input:focus ~ label,
+    .field-group input:not(:placeholder-shown) ~ label,
+    .field-group textarea:focus ~ label,
+    .field-group textarea:not(:placeholder-shown) ~ label {
+        top: 0;
+        left: 16px;
+        font-size: 10px;
+        color: #ef233c;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        background: #0f0f0f;
+    }
+
+    .field-group input, .field-group textarea {
+        padding-top: 24px !important;
+    }
+
+    /* Skeleton Loading Shimmer */
+    .skeleton-box {
+        position: relative;
+        overflow: hidden;
+        background-color: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+    }
+
+    .skeleton-box::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+        animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+        100% { transform: translateX(100%); }
+    }
+
+    /* FAB - Floating Action Button */
+    .fab-container {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        z-index: 1000;
+    }
+
+    .fab-btn {
+        width: 64px;
+        height: 64px;
+        border-radius: 20px;
+        background: #ef233c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        box-shadow: 0 10px 30px rgba(239, 35, 60, 0.4);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .fab-btn:hover {
+        transform: translateY(-5px) rotate(90deg) scale(1.1);
+        box-shadow: 0 15px 40px rgba(239, 35, 60, 0.6);
     }
 
     /* Background Beams */
     .beam {
-        @apply absolute top-[-20%] w-[1.5px] bg-gradient-to-b from-transparent via-primary/40 to-transparent;
-        animation: beam-fall 8s linear infinite;
+        width: 1px;
+        background: linear-gradient(to bottom, transparent, rgba(239, 35, 60, 0.4), transparent);
+        position: absolute;
+        animation: beam-fall 4s linear infinite;
+        pointer-events: none;
     }
 
     @keyframes beam-fall {
-        0% { transform: translateY(-100%); opacity: 0; }
-        10% { opacity: 1; }
-        90% { opacity: 1; }
-        100% { transform: translateY(400%); opacity: 0; }
+        0% {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        5% {
+            opacity: 0.5;
+        }
+
+        50% {
+            opacity: 1;
+        }
+
+        95% {
+            opacity: 0.5;
+        }
+
+        100% {
+            transform: translateY(120vh);
+            opacity: 0;
+        }
     }
 
-    .delay-beam-1 { animation-delay: -1s; }
-    .delay-beam-2 { animation-delay: -3s; animation-duration: 10s; }
-    .delay-beam-3 { animation-delay: -6s; animation-duration: 12s; }
-    .delay-beam-4 { animation-delay: -2s; animation-duration: 9s; }
+    .delay-1 {
+        animation-delay: 0.2s;
+    }
+
+    .delay-2 {
+        animation-delay: 0.5s;
+    }
+
+    .delay-3 {
+        animation-delay: 0.8s;
+    }
+
+    /* Modal System */
+    .modal-overlay {
+        @apply fixed inset-0 z-[5000] items-center justify-center p-4 bg-black/60 backdrop-blur-md transition-all duration-300;
+        display: none;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    .modal-content {
+        @apply relative w-full max-w-4xl mx-auto;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    /* Navbar Premium Refinement */
+    header {
+        @apply transition-all duration-500;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .nav-container {
+        @apply relative flex items-center gap-8 py-2;
+    }
+
+    .nav-tab {
+        @apply text-sm font-bold tracking-widest transition-all duration-300 px-4 py-2 relative z-10;
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .nav-tab.active {
+        @apply text-primary;
+    }
+
+    .nav-indicator {
+        position: absolute;
+        bottom: 0;
+        height: 2px;
+        background-color: #ef233c;
+        border-radius: 9999px;
+        transition: all 500ms cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow: 0 0 15px rgba(239, 35, 60, 0.6);
+        width: 0;
+        left: 0;
+    }
+
+    /* Remove redundant blur divider */
+    .gradient-blur {
+        display: none !important;
+    }
+
+    /* Animation utilities for JS or static use */
+    .animate-fade-in {
+        animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    .animate-fade-slide {
+        animation: fadeSlide 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeSlide {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 }
-
-/* Tab Active State */
-.tab-active {
-    @apply text-white relative;
-}
-
-.tab-active::after {
-    content: '';
-    @apply absolute bottom-[-4px] left-0 right-0 h-0.5 bg-primary shadow-[0_0_10px_rgba(239,35,60,0.8)];
-}
-
-/* Animation utilities for JS or static use */
-.animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-.animate-fade-slide { animation: fadeSlide 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-@keyframes fadeSlide { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
