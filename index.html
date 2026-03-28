@@ -1,24 +1,180 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dr Escale - Premium Billing</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PV | PromptVault</title>
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div id="app">
-      <main class="hero">
-        <div class="glass-card">
-          <h1 class="premium-title">dr escale</h1>
-          <p class="subtitle">Infraestrutura frontend conectada ao Supabase</p>
-          <div id="status" class="status-badge">Conectando...</div>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container header-content">
+            <div class="logo">
+                <span class="logo-text">PV</span>
+                <span class="logo-full">PromptVault</span>
+            </div>
+            <nav class="main-nav">
+                <button id="nav-prompts" class="nav-btn active">PROMPTS</button>
+                <button id="nav-anotacoes" class="nav-btn">ANOTAÇÕES</button>
+            </nav>
         </div>
-      </main>
+    </header>
+
+    <main class="container">
+        <!-- Section: PROMPTS -->
+        <section id="section-prompts" class="page-section">
+            <div class="section-header">
+                <div>
+                    <h1>Minha Coleção</h1>
+                    <p id="prompt-counter" class="counter">0 prompts salvos</p>
+                </div>
+                <button id="btn-new-prompt" class="btn btn-primary">+ Novo Prompt</button>
+            </div>
+
+            <div id="prompt-filters" class="filters-bar">
+                <!-- Categorias dinâmicas virão aqui -->
+            </div>
+
+            <div id="prompts-grid" class="grid-prompts">
+                <!-- Cards de prompts virão aqui -->
+            </div>
+        </section>
+
+        <!-- Section: ANOTAÇÕES -->
+        <section id="section-anotacoes" class="page-section hidden">
+            <div class="section-header">
+                <div>
+                    <h1>Anotações</h1>
+                    <p id="anotacao-counter" class="counter">0 anotações salvas</p>
+                </div>
+                <button id="btn-new-anotacao" class="btn btn-primary">+ Nova</button>
+            </div>
+
+            <div id="anotacao-filters" class="filters-bar">
+                <!-- Tags dinâmicas virão aqui -->
+            </div>
+
+            <div id="anotacoes-grid" class="grid-anotacoes">
+                <!-- Cards de anotações virão aqui -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal: Novo/Editar Prompt -->
+    <div id="modal-prompt" class="modal">
+        <div class="modal-content">
+            <h2 class="mono">[ <span id="prompt-modal-title">Novo Prompt</span> ]</h2>
+            <form id="form-prompt">
+                <input type="hidden" id="prompt-id">
+                <div class="form-group">
+                    <label for="p-titulo">Título*</label>
+                    <input type="text" id="p-titulo" placeholder="Ex: Retrato Cyberpunk" required>
+                </div>
+                <div class="form-group">
+                    <label for="p-descricao">Descrição</label>
+                    <input type="text" id="p-descricao" placeholder="Breve descrição do uso">
+                </div>
+                <div class="form-group">
+                    <label for="p-prompt">Prompt*</label>
+                    <textarea id="p-prompt" rows="5" placeholder="Digite seu prompt completo aqui..." required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label for="p-categoria">Categoria</label>
+                        <div class="select-wrapper">
+                            <select id="p-categoria">
+                                <option value="ARTE">ARTE</option>
+                                <option value="FOTOGRAFIA">FOTOGRAFIA</option>
+                                <option value="ESCRITA">ESCRITA</option>
+                                <option value="CÓDIGO">CÓDIGO</option>
+                                <option value="MARKETING">MARKETING</option>
+                                <option value="NEGÓCIOS">NEGÓCIOS</option>
+                                <option value="EDUCAÇÃO">EDUCAÇÃO</option>
+                            </select>
+                            <button type="button" id="btn-add-cat" class="btn-small">+ Cat.</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Imagem</label>
+                    <div class="toggle-group">
+                        <input type="text" id="p-imagem-url" placeholder="URL da imagem">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Criar Prompt</button>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <!-- Modal: Nova/Editar Anotação -->
+    <div id="modal-anotacao" class="modal">
+        <div class="modal-content">
+            <h2 class="mono">[ <span id="anotacao-modal-title">Nova Anotação</span> ]</h2>
+            <form id="form-anotacao">
+                <input type="hidden" id="anotacao-id">
+                <div class="form-group">
+                    <label for="a-titulo">Título</label>
+                    <input type="text" id="a-titulo" placeholder="Título da nota">
+                </div>
+                <div class="form-group">
+                    <label for="a-tag">Tag</label>
+                    <div class="select-wrapper">
+                        <select id="a-tag">
+                            <option value="Ângulos">Ângulos</option>
+                            <option value="Iluminação">Iluminação</option>
+                            <option value="Composição">Composição</option>
+                            <option value="Dicas">Dicas</option>
+                            <option value="Estilos">Estilos</option>
+                            <option value="Câmera">Câmera</option>
+                            <option value="links">links</option>
+                        </select>
+                        <button type="button" id="btn-add-tag" class="btn-small">+ Tag</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="a-conteudo">Conteúdo</label>
+                    <textarea id="a-conteudo" rows="8" placeholder="Escreva suas notas ou cole links aqui..."></textarea>
+                </div>
+                <div class="form-group">
+                   <label for="a-imagem-url">URL da Imagem</label>
+                   <input type="text" id="a-imagem-url" placeholder="Opcional">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Criar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Ver Prompt -->
+    <div id="modal-view-prompt" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header-view">
+                <h2 id="view-title" class="mono"></h2>
+                <button class="close-modal btn-icon-close">&times;</button>
+            </div>
+            <div class="view-body">
+                <div id="view-image-container" class="view-image"></div>
+                <div class="view-details">
+                    <span id="view-category" class="badge"></span>
+                    <p id="view-description" class="view-desc"></p>
+                    <div class="prompt-box">
+                        <pre id="view-content"></pre>
+                        <button id="btn-copy-prompt" class="btn-copy">Copiar Prompt</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="/src/main.js"></script>
-  </body>
+</body>
 </html>
