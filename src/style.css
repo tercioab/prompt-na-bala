@@ -2,66 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;700;800&family=Space+Mono&display=swap');
-
-:root {
-    --brand-primary: #ef233c;
-    --brand-secondary: #ea580c;
-    --brand-accent: #dc2626;
-    --glow-color: rgba(239, 35, 60, 0.4);
-    --glass-bg: rgba(10, 10, 10, 0.6);
-    --border-glass: rgba(255, 255, 255, 0.1);
-    
-    /* Legacy compatibility for JS logic if needed */
-    --accent-color: #ef233c;
-    --bg-color: #030303;
-}
-
 @layer base {
     body {
-        @apply bg-[#030303] text-white font-sans selection:bg-primary/30 selection:text-primary-100 overflow-x-hidden;
+        @apply bg-[#030303] text-white selection:bg-primary/30 selection:text-white;
+        font-family: 'Inter', sans-serif;
+        overflow-x: hidden;
     }
 }
 
 @layer components {
-    /* Glass & Glow Styles */
     .glass-panel {
-        @apply bg-[rgba(10,10,10,0.6)] backdrop-blur-[24px] border border-[rgba(255,255,255,0.1)];
+        @apply bg-[rgba(15,15,15,0.7)] backdrop-blur-xl border border-white/5;
     }
 
     .glow-card {
-        @apply shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.05)] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)];
-        transform-style: preserve-3d;
+        @apply glass-panel transition-all duration-500 hover:border-primary/30 hover:shadow-[0_0_30px_rgba(239,35,60,0.15)];
     }
 
-    .glow-card:hover {
-        @apply -translate-y-2 shadow-[0_25px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.1),0_0_60px_rgba(239,35,60,0.2)];
-        transform: perspective(1000px) rotateX(2deg) rotateY(-2deg);
-    }
-
-    .text-glow {
-        text-shadow: 0 0 20px rgba(239, 35, 60, 0.5);
-    }
-
-    /* Premium Buttons */
-    .btn-particle {
-        @apply cursor-pointer relative inline-flex items-center justify-center overflow-hidden transition-all duration-300;
-        background: radial-gradient(65.28% 65.28% at 50% 100%, rgba(239, 35, 60, 0.8) 0%, rgba(239, 35, 60, 0) 100%), linear-gradient(0deg, #ef233c, #ef233c);
-        @apply rounded-full border-none px-6 min-h-[48px] shadow-lg;
-        isolation: isolate;
-    }
-
-    .btn-particle::before {
-        @apply absolute inset-[1px] rounded-full transition-all duration-500 z-[1];
-        content: "";
-        background: linear-gradient(177.95deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%);
-    }
-
-    .btn-particle:hover {
-        @apply -translate-y-0.5 shadow-[0_10px_20px_-5px_rgba(239,35,60,0.5)];
-    }
-
-    /* Shiny CTA (Elite) */
+    /* Shiny CTA - Premium Button Style */
     .shiny-cta {
         @apply relative overflow-hidden rounded-full font-bold cursor-pointer transition-all duration-300 inline-flex items-center justify-center min-h-[56px] border border-white/10;
         background: radial-gradient(65% 65% at 50% 100%, rgba(239, 35, 60, 0.4) 0%, rgba(255, 55, 0, 0.9) 100%), #f75103;
@@ -69,7 +27,7 @@
     }
 
     .btn-aura-border {
-        @apply absolute inset-0 pointer-events-none overflow-hidden z-0 rounded-inherit;
+        @apply absolute inset-0 pointer-events-none overflow-hidden z-0 rounded-full;
     }
 
     .aura-spinner {
@@ -79,102 +37,71 @@
     }
 
     .btn-aura-inner {
-        @apply absolute inset-[1.5px] rounded-inherit z-[1];
+        @apply absolute inset-[1.5px] rounded-full z-[1];
         background: radial-gradient(80% 100% at 50% 100%, rgba(239, 35, 60, 0.2) 0%, transparent 70%), #050505;
     }
 
+    .btn-content {
+        @apply relative z-10 flex items-center justify-center gap-2 px-8 py-2 text-white;
+    }
+
     .btn-aura-glow {
-        @apply absolute inset-0 rounded-inherit pointer-events-none z-0 transition-opacity duration-700 opacity-0;
+        @apply absolute inset-0 rounded-full pointer-events-none z-0 transition-opacity duration-700 opacity-0;
     }
 
     .btn-aura-glow-default {
-        @apply opacity-100 blur-[10px];
-        background: radial-gradient(20% 50% at 50% 100%, rgba(239, 35, 60, 0.5) 0%, rgba(239, 35, 60, 0) 100%);
+        background: radial-gradient(60% 60% at 50% 100%, rgba(239, 35, 60, 0.6) 0%, transparent 100%);
+        @apply opacity-100;
     }
 
-    .shiny-cta:hover { @apply -translate-y-1 scale-[1.02] shadow-[0_20px_40px_rgba(255,98,0,0.4)]; }
-    .shiny-cta:hover .btn-aura-glow-default { @apply opacity-30; }
-
-    /* Particle Points */
-    .points_wrapper { @apply absolute inset-0 overflow-hidden pointer-events-none z-10; }
-    .point { @apply absolute bottom-[-5px] w-[2px] h-[2px] bg-white rounded-full opacity-0 animate-particle-up; }
-
-    /* Ambient Elements */
-    .ambient-light {
-        @apply absolute w-[800px] h-[800px] rounded-full blur-[80px] pointer-events-none -z-10 animate-pulse-glow;
-        background: radial-gradient(circle, rgba(255, 0, 30, 0.25) 0%, rgba(71, 0, 0, 0.1) 30%, transparent 100%);
+    /* Particles inside button */
+    .points_wrapper {
+        @apply absolute inset-0 overflow-hidden pointer-events-none z-0;
     }
 
+    .point {
+        @apply absolute w-[2px] h-[2px] bg-white rounded-full opacity-0;
+        animation: particle-up 3s ease-out infinite;
+    }
+
+    @keyframes particle-up {
+        0% { transform: translateY(100%) scale(0); opacity: 0; }
+        20% { opacity: 0.8; }
+        100% { transform: translateY(-200%) scale(1.5); opacity: 0; }
+    }
+
+    /* Background Beams */
     .beam {
-        @apply w-px absolute animate-beam-fall;
-        background: linear-gradient(to bottom, transparent, rgba(239, 35, 60, 0.8), transparent);
+        @apply absolute top-[-20%] w-[1.5px] bg-gradient-to-b from-transparent via-primary/40 to-transparent;
+        animation: beam-fall 8s linear infinite;
     }
 
-    /* Progressive Blur Top */
-    .gradient-blur {
-        @apply fixed inset-x-0 top-0 h-[120px] pointer-events-none z-40;
-    }
-    .gradient-blur::after {
-        content: ""; @apply absolute inset-0 backdrop-blur-[12px];
-        mask: linear-gradient(to top, transparent, black);
-        -webkit-mask: linear-gradient(to top, transparent, black);
+    @keyframes beam-fall {
+        0% { transform: translateY(-100%); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(400%); opacity: 0; }
     }
 
-    /* Modals Modern */
-    .modal-content-new {
-        @apply glass-panel rounded-[2rem] p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-fade-slide shadow-2xl;
-    }
+    .delay-beam-1 { animation-delay: -1s; }
+    .delay-beam-2 { animation-delay: -3s; animation-duration: 10s; }
+    .delay-beam-3 { animation-delay: -6s; animation-duration: 12s; }
+    .delay-beam-4 { animation-delay: -2s; animation-duration: 9s; }
 }
 
-/* Base Animations */
-@keyframes fadeSlideIn {
-    0% { opacity: 0; transform: translateY(30px); filter: blur(8px); }
-    100% { opacity: 1; transform: translateY(0); filter: blur(0px); }
+/* Tab Active State */
+.tab-active {
+    @apply text-white relative;
 }
 
-@keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px var(--glow-color); transform: scale(1); }
-    50% { box-shadow: 0 0 60px var(--glow-color), 0 0 100px rgba(255,255,255,0.1); transform: scale(1.05); }
+.tab-active::after {
+    content: '';
+    @apply absolute bottom-[-4px] left-0 right-0 h-0.5 bg-primary shadow-[0_0_10px_rgba(239,35,60,0.8)];
 }
 
-@keyframes particle-up {
-    0% { transform: translateY(100%); opacity: 0; }
-    50% { opacity: 1; }
-    100% { transform: translateY(-60px); opacity: 0; }
-}
+/* Animation utilities for JS or static use */
+.animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-@keyframes beam-fall {
-    0% { transform: translateY(-100%); opacity: 0; }
-    5% { opacity: 0.5; }
-    50% { opacity: 1; }
-    95% { opacity: 0.5; }
-    100% { transform: translateY(120vh); opacity: 0; }
-}
-
-.animate-fade-slide { animation: fadeSlideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.animate-particle-up { animation: particle-up 2s infinite ease-in; }
-.animate-beam-fall { animation: beam-fall 4s linear infinite; }
-
-/* Skeletons */
-.skeleton-shimmer {
-    @apply relative overflow-hidden bg-white/5 rounded;
-}
-
-.skeleton-shimmer::after {
-    @apply absolute inset-0 -translate-x-full;
-    content: "";
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-    animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-    100% { transform: translateX(100%); }
-}
-
-/* Scrollbar Customization */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { @apply bg-[#030303]; }
-::-webkit-scrollbar-thumb { @apply bg-white/10 rounded-full border-2 border-[#030303] hover:bg-primary; }
-
-/* Selection */
-::selection { @apply bg-primary/30 text-white; }
+.animate-fade-slide { animation: fadeSlide 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+@keyframes fadeSlide { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
