@@ -100,9 +100,15 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Imagem</label>
-                    <div class="toggle-group">
-                        <input type="text" id="p-imagem-url" placeholder="URL da imagem">
+                    <label>Imagem (URL ou Arquivo)</label>
+                    <div style="display: flex; gap: 10px; flex-direction: column;">
+                        <input type="text" id="p-imagem-url" placeholder="Colar link da imagem...">
+                        <p style="text-align: center; margin: 5px 0; opacity: 0.5; font-size: 0.8rem;">- OU -</p>
+                        <label for="p-imagem-file" class="btn btn-secondary" style="display: block; text-align: center; cursor: pointer; padding: 10px; font-size: 0.9rem;">
+                            📷 Carregar do Dispositivo
+                        </label>
+                        <input type="file" id="p-imagem-file" accept="image/*" style="display: none;">
+                        <div id="file-chosen" style="text-align: center; font-size: 0.8rem; color: var(--accent-color); min-height: 1.2em;">Nenhum arquivo selecionado</div>
                     </div>
                 </div>
                 <div class="modal-footer">
