@@ -204,7 +204,11 @@ async function handleLogin(e) {
             showScreen('pending');
         }
     } catch (err) {
-        elements.lError.textContent = 'Credenciais inválidas ou erro de conexão.';
+        let msg = 'Credenciais inválidas ou erro de conexão.';
+        if (err.status === 429) msg = 'Muitas tentativas. Aguarde um momento.';
+        if (err.message?.includes('Email not confirmed')) msg = 'Confirme seu email para entrar.';
+        
+        elements.lError.textContent = msg;
         elements.lError.classList.remove('hidden');
         showToast('Falha no login', 'error');
     } finally {
@@ -218,6 +222,7 @@ async function handleSignup(e) {
     const email = elements.sEmail.value.trim();
     const password = elements.sPass.value;
     const confirm = elements.sConfirm.value;
+    const generalError = document.getElementById('s-error-general');
 
     let hasError = false;
     
@@ -237,7 +242,17 @@ async function handleSignup(e) {
         showScreen('pending');
         showToast('Conta criada com sucesso!', 'success');
     } catch (err) {
-        showToast(err.message, 'error');
+        console.error("Erro no cadastro:", err);
+        let msg = err.message || 'Erro ao criar conta.';
+        if (err.status === 429 || err.message?.includes('rate limit')) {
+            msg = 'Limite de e-mails excedido no Supabase. Aguarde alguns minutos.';
+        }
+        
+        if (generalError) {
+            generalError.textContent = msg;
+            generalError.classList.remove('hidden');
+        }
+        showToast('Erro no cadastro', 'error');
     } finally {
         setSubmitLoading('btn-signup-submit', false);
     }
