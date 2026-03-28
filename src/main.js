@@ -104,7 +104,7 @@ function renderPromptsGrid() {
             <div class="card-content">
                 <span class="card-badge">${prompt.categoria || 'GERAL'}</span>
                 <h3 class="card-title">${prompt.titulo}</h3>
-                <p class="card-desc">${prompt.descricao || ''} <span class="copy-hint">(Clique p/ copiar)</span></p>
+                <p class="card-desc">${prompt.descricao || ''}</p>
             </div>
             <div class="card-actions">
                 <button class="btn-action" onclick="event.stopPropagation(); window.viewPrompt('${prompt.id}')">👁</button>
