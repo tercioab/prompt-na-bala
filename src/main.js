@@ -2,7 +2,7 @@ import {
     buscarPrompts, criarPrompt, editarPrompt, deletarPrompt, 
     buscarAnotacoes, criarAnotacao, editarAnotacao, deletarAnotacao,
     uploadImagem, loginUsuario, cadastrarUsuario, logoutUsuario, 
-    reenviarConfirmacao, supabase
+    reenviarConfirmacao, supabase, vincularDadosLegados
 } from './supabase.js';
 
 // ===================== ESTADO =====================
@@ -88,12 +88,15 @@ async function initAuth() {
 
         if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
             if (state.user) {
+                // Tenta vincular dados de forma não-bloqueante
+                vincularDadosLegados();
+                
                 // Verificar se o email foi confirmado
                 if (state.user.identities && state.user.id && !state.user.email_confirmed_at) {
                    showScreen('pending');
                 } else {
                     showScreen('app');
-                    await refreshAppData();
+                    refreshAppData(); // Carrega dados em segundo plano
                 }
             } else {
                 showScreen('auth');
@@ -113,7 +116,7 @@ async function initAuth() {
             showScreen('pending');
         } else {
             showScreen('app');
-            await refreshAppData();
+            refreshAppData();
         }
     } else {
         showScreen('auth');
@@ -153,40 +156,64 @@ function resetAppState() {
 
 async function fetchData() {
     try {
-        state.prompts = await buscarPrompts();
-        state.anotacoes = await buscarAnotacoes();
+        console.log("Iniciando busca de dados...");
+        const [prompts, anotacoes] = await Promise.allSettled([
+            buscarPrompts(),
+            buscarAnotacoes()
+        ]);
+        
+        state.prompts = prompts.status === 'fulfilled' ? prompts.value : [];
+        state.anotacoes = anotacoes.status === 'fulfilled' ? anotacoes.value : [];
+
+        if (prompts.status === 'rejected') console.error("Falha ao carregar prompts:", prompts.reason);
+        if (anotacoes.status === 'rejected') console.error("Falha ao carregar anotações:", anotacoes.reason);
         
         // Atualizar categorias e tags dinâmicas baseadas nos dados do usuário
-        const customCats = state.prompts
+        const allPrompts = state.prompts || [];
+        const customCats = allPrompts
             .map(p => p.categoria)
             .filter(c => c && !['TODOS', 'ARTE', 'FOTOGRAFIA', 'ESCRITA', 'CÓDIGO', 'MARKETING', 'NEGÓCIOS', 'EDUCAÇÃO'].includes(c));
-        const defaultCats = ['TODOS', 'ARTE', 'FOTOGRAFIA', 'ESCRITA', 'CÓDIGO', 'MARKETING', 'NEGÓCIOS', 'EDUCAÇÃO'];
-        state.categories = [...new Set([...defaultCats, ...customCats])];
+        
+        state.categories = [...new Set(['TODOS', 'ARTE', 'FOTOGRAFIA', 'ESCRITA', 'CÓDIGO', 'MARKETING', 'NEGÓCIOS', 'EDUCAÇÃO', ...customCats])];
 
-        const customTags = state.anotacoes
+        const allNotes = state.anotacoes || [];
+        const customTags = allNotes
             .map(a => a.tag)
             .filter(t => t && !['Todos', 'Ângulos', 'Iluminação', 'Composição', 'Dicas', 'Estilos', 'Câmera', 'links'].includes(t));
-        const defaultTags = ['Todos', 'Ângulos', 'Iluminação', 'Composição', 'Dicas', 'Estilos', 'Câmera', 'links'];
-        state.tags = [...new Set([...defaultTags, ...customTags])];
+        
+        state.tags = [...new Set(['Todos', 'Ângulos', 'Iluminação', 'Composição', 'Dicas', 'Estilos', 'Câmera', 'links', ...customTags])];
+        
+        console.log(`Dados carregados: ${allPrompts.length} prompts, ${allNotes.length} anotações.`);
     } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-        showToast('Nenhum dado encontrado ou erro de conexão.', 'info');
+        console.error("Erro crítico em fetchData:", error);
+        showToast('Erro ao sincronizar dados. Verifique sua conexão.', 'error');
     }
 }
 
 // ===================== TOAST SYSTEM =====================
 function showToast(message, type = 'success') {
-    const icons = { success: '✓', error: '✕', info: 'ℹ' };
+    const icons = { success: 'check-circle', error: 'alert-circle', info: 'info' };
+    const colors = {
+        success: 'border-green-500 text-green-400',
+        error: 'border-red-500 text-red-400',
+        info: 'border-blue-500 text-blue-400'
+    };
+    
     const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `<span class="toast-icon">${icons[type] || '•'}</span><span>${message}</span>`;
+    toast.className = `glass-panel rounded-2xl px-6 py-4 shadow-2xl flex items-center gap-4 border-l-4 ${colors[type]} animate-fade-slide`;
+    toast.innerHTML = `
+        <i data-lucide="${icons[type]}" class="w-5 h-5"></i>
+        <span class="text-sm font-bold font-manrope tracking-tight">${message}</span>
+    `;
     elements.toastContainer.appendChild(toast);
+    lucide.createIcons({ props: { "stroke-width": 3 }, nameAttr: 'data-lucide', root: toast });
 
     const remove = () => {
-        toast.classList.add('hiding');
-        toast.addEventListener('animationend', () => toast.remove(), { once: true });
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(20px)';
+        setTimeout(() => toast.remove(), 300);
     };
-    setTimeout(remove, 3200);
+    setTimeout(remove, 4000);
 }
 
 // ===================== AUTH HANDLERS =====================
@@ -327,13 +354,15 @@ function renderSkeletons(grid, count) {
     const fragment = document.createDocumentFragment();
     for (let i = 0; i < count; i++) {
         const el = document.createElement('div');
-        el.className = 'skeleton-card';
+        el.className = 'glass-panel rounded-3xl p-6 aspect-[4/5] overflow-hidden';
         el.innerHTML = `
-            <div class="skel-image skeleton"></div>
-            <div class="skel-body">
-                <div class="skel-badge skeleton"></div>
-                <div class="skel-title skeleton"></div>
-                <div class="skel-desc skeleton"></div>
+            <div class="skeleton-shimmer h-full flex flex-col gap-4">
+                <div class="h-1/2 bg-white/5 rounded-2xl"></div>
+                <div class="space-y-3 p-2">
+                    <div class="h-4 bg-white/10 rounded w-1/4"></div>
+                    <div class="h-6 bg-white/10 rounded w-3/4"></div>
+                    <div class="h-4 bg-white/10 rounded w-full"></div>
+                </div>
             </div>`;
         fragment.appendChild(el);
     }
@@ -347,70 +376,124 @@ function renderAll() {
     renderPromptsGrid();
     renderAnotacoesGrid();
     updateCounters();
+    // Re-initialize Lucide icons for all newly added elements
+    lucide.createIcons();
 }
 
 function renderFilters() {
+    const filterBtnClass = (active) => `
+        px-6 py-2.5 rounded-full text-xs font-bold font-manrope tracking-widest transition-all duration-300 whitespace-nowrap border
+        ${active 
+            ? 'bg-primary border-primary text-white shadow-[0_0_20px_rgba(239,35,60,0.4)]' 
+            : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10 hover:border-white/20'}
+    `;
+
+    const noteFilterBtnClass = (active) => `
+        px-6 py-2.5 rounded-full text-xs font-bold font-manrope tracking-widest transition-all duration-300 whitespace-nowrap border
+        ${active 
+            ? 'bg-secondary border-secondary text-white shadow-[0_0_20px_rgba(234,88,12,0.4)]' 
+            : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10 hover:border-white/10'}
+    `;
+
     elements.promptFilters.innerHTML = state.categories.map(cat => `
-        <button class="filter-tag ${state.promptFilter === cat ? 'active' : ''}" 
+        <button class="${filterBtnClass(state.promptFilter === cat)}" 
                 onclick="window.setPromptFilter('${cat}')">
             ${cat}
         </button>
     `).join('');
 
     elements.anotacaoFilters.innerHTML = state.tags.map(tag => `
-        <button class="filter-tag ${state.anotacaoFilter === tag ? 'active' : ''}" 
+        <button class="${noteFilterBtnClass(state.anotacaoFilter === tag)}" 
                 onclick="window.setAnotacaoFilter('${tag}')">
-            ${tag}
+            ${tag.toUpperCase()}
         </button>
     `).join('');
 }
 
 function buildPromptCard(prompt, animate = false) {
     const div = document.createElement('div');
-    div.className = `card${animate ? ' card-entering' : ''}`;
+    div.className = `glow-card glass-panel rounded-[2.5rem] overflow-hidden group/card relative flex flex-col ${animate ? 'animate-fade-slide' : ''}`;
     div.id = `card-${prompt.id}`;
-    div.onclick = () => window.copyPrompt(prompt.id);
 
     const imgHtml = prompt.imagem_url
-        ? `<img src="${prompt.imagem_url}" loading="lazy" class="loading" 
-              alt="${prompt.titulo}"
-              onload="this.classList.remove('loading')"
-              onerror="this.parentElement.innerHTML='<span class=\\'card-fallback\\'>Sem Imagem</span>'">`
-        : `<span class="card-fallback">Sem Imagem</span>`;
+        ? `<img src="${prompt.imagem_url}" loading="lazy" 
+              class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110 opacity-60 group-hover/card:opacity-100" 
+              alt="${prompt.titulo}">`
+        : `<div class="w-full h-full flex items-center justify-center bg-white/5 text-gray-700 font-bold uppercase tracking-widest text-xs">Sem Imagem</div>`;
 
     div.innerHTML = `
-        <div class="card-image">${imgHtml}</div>
-        <div class="card-content">
-            <span class="card-badge">${prompt.categoria || 'GERAL'}</span>
-            <h3 class="card-title">${prompt.titulo}</h3>
-            <p class="card-desc">${prompt.descricao || ''}</p>
+        <div class="relative h-64 overflow-hidden border-b border-white/5">
+            ${imgHtml}
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-60"></div>
+            <div class="absolute top-6 left-6">
+                <span class="px-3 py-1 bg-primary/20 backdrop-blur-md border border-primary/30 rounded-lg text-[10px] font-bold text-primary tracking-widest uppercase">
+                    ${prompt.categoria || 'GERAL'}
+                </span>
+            </div>
+            <div class="absolute top-6 right-6 flex flex-col gap-2 translate-x-12 opacity-0 group-hover/card:translate-x-0 group-hover/card:opacity-100 transition-all duration-500">
+                <button onclick="event.stopPropagation(); window.viewPrompt('${prompt.id}')" class="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-primary hover:border-primary transition-all shadow-xl">
+                    <i data-lucide="eye" class="w-4 h-4"></i>
+                </button>
+                <button onclick="event.stopPropagation(); window.editPrompt('${prompt.id}')" class="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-xl">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                </button>
+                <button onclick="event.stopPropagation(); window.deletePromptHandler('${prompt.id}')" class="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-red-400 hover:bg-red-500 hover:text-white transition-all shadow-xl">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            </div>
         </div>
-        <div class="card-actions">
-            <button class="btn-action" title="Ver" onclick="event.stopPropagation(); window.viewPrompt('${prompt.id}')">👁</button>
-            <button class="btn-action" title="Editar" onclick="event.stopPropagation(); window.editPrompt('${prompt.id}')">✎</button>
-            <button class="btn-action" title="Excluir" onclick="event.stopPropagation(); window.deletePromptHandler('${prompt.id}')">×</button>
+        
+        <div class="p-8 flex flex-col flex-1 cursor-pointer" onclick="window.copyPrompt('${prompt.id}')">
+            <h3 class="text-xl font-manrope font-extrabold tracking-tight text-white mb-2 group-hover/card:text-primary transition-colors">${prompt.titulo}</h3>
+            <p class="text-gray-500 text-sm line-clamp-2 leading-relaxed mb-6 flex-1">${prompt.descricao || ''}</p>
+            
+            <div class="flex items-center justify-between pt-4 border-t border-white/5">
+                <span class="text-[10px] font-mono text-gray-600 uppercase tracking-widest">Clique para copiar</span>
+                <i data-lucide="copy" class="w-4 h-4 text-gray-600 group-hover/card:text-primary transition-colors"></i>
+            </div>
         </div>
-        <div class="copy-overlay">✓ Copiado!</div>
+        
+        <div id="copy-overlay-${prompt.id}" class="absolute inset-0 bg-primary/90 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-300 z-20">
+            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-2xl">
+                <i data-lucide="check" class="w-8 h-8 text-primary"></i>
+            </div>
+            <span class="text-white font-manrope font-black text-2xl tracking-tighter">COPIADO!</span>
+        </div>
     `;
     return div;
 }
 
 function buildNotaCard(nota, animate = false) {
     const div = document.createElement('div');
-    div.className = `card nota-card${animate ? ' card-entering' : ''}`;
+    div.className = `glow-card glass-panel rounded-[2rem] p-8 relative flex flex-col group/nota ${animate ? 'animate-fade-slide' : ''}`;
     div.id = `card-nota-${nota.id}`;
 
     div.innerHTML = `
-        <div class="card-content">
-            <span class="card-badge">${nota.tag || 'Dicas'}</span>
-            <h3 class="card-title">${nota.titulo || 'Sem Título'}</h3>
-            <div class="card-desc" style="-webkit-line-clamp: 6; line-clamp: 6;">
-                ${formatContent(nota.conteudo)}
+        <div class="flex items-center justify-between mb-6">
+            <span class="px-3 py-1 bg-secondary/10 border border-secondary/20 rounded-lg text-[10px] font-bold text-secondary tracking-widest uppercase">
+                ${nota.tag || 'DICAS'}
+            </span>
+            <div class="flex gap-2 opacity-0 group-hover/nota:opacity-100 transition-opacity">
+                <button onclick="event.stopPropagation(); window.editAnotacao('${nota.id}')" class="text-gray-500 hover:text-white transition-colors">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                </button>
+                <button onclick="event.stopPropagation(); window.deleteAnotacaoHandler('${nota.id}')" class="text-gray-500 hover:text-red-400 transition-colors">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
             </div>
         </div>
-        <div class="card-actions">
-            <button class="btn-action" title="Editar" onclick="event.stopPropagation(); window.editAnotacao('${nota.id}')">✎</button>
-            <button class="btn-action" title="Excluir" onclick="event.stopPropagation(); window.deleteAnotacaoHandler('${nota.id}')">×</button>
+        
+        <h3 class="text-lg font-manrope font-extrabold text-white mb-4 tracking-tight group-hover/nota:text-secondary transition-colors underline decoration-secondary/30 decoration-2 underline-offset-4">
+            ${nota.titulo || 'Sem Título'}
+        </h3>
+        
+        <div class="text-gray-400 text-sm leading-relaxed overflow-hidden flex-1" style="display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical;">
+            ${formatContent(nota.conteudo)}
+        </div>
+        
+        <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-600 uppercase tracking-widest">
+            <span>Nota rápida</span>
+            <i data-lucide="file-text" class="w-3 h-3"></i>
         </div>
     `;
     return div;
@@ -511,9 +594,11 @@ function setupEventListeners() {
     document.querySelectorAll('.btn-toggle-pass').forEach(btn => {
         btn.addEventListener('click', () => {
             const input = btn.parentElement.querySelector('input');
+            const icon = btn.querySelector('i');
             const type = input.type === 'password' ? 'text' : 'password';
             input.type = type;
-            btn.textContent = type === 'password' ? '👁' : '🔒';
+            icon.setAttribute('data-lucide', type === 'password' ? 'eye' : 'eye-off');
+            lucide.createIcons({ nameAttr: 'data-lucide', root: btn });
         });
     });
 
@@ -635,51 +720,70 @@ function setupEventListeners() {
 // ===================== NAVEGAÇÃO =====================
 function switchTab(tab) {
     state.activeTab = tab;
-    elements.navPrompts.classList.toggle('active', tab === 'prompts');
-    elements.navAnotacoes.classList.toggle('active', tab === 'anotacoes');
-    elements.sectionPrompts.classList.toggle('hidden', tab !== 'prompts');
-    elements.sectionAnotacoes.classList.toggle('hidden', tab !== 'anotacoes');
+    if (elements.navPrompts) elements.navPrompts.classList.toggle('active', tab === 'prompts');
+    if (elements.navAnotacoes) elements.navAnotacoes.classList.toggle('active', tab === 'anotacoes');
+    if (elements.sectionPrompts) elements.sectionPrompts.classList.toggle('hidden', tab !== 'prompts');
+    if (elements.sectionAnotacoes) elements.sectionAnotacoes.classList.toggle('hidden', tab !== 'anotacoes');
+    
+    // Smooth scroll to top when switching
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ===================== MODAIS =====================
 function openModal(type, data = null) {
     if (type === 'prompt') {
         const form = document.getElementById('form-prompt');
-        form.reset();
+        if (form) form.reset();
         hideFormError('prompt-error-msg');
         document.getElementById('prompt-id').value = data ? data.id : '';
         document.getElementById('prompt-modal-title').innerText = data ? 'Editar Prompt' : 'Novo Prompt';
         const submitBtn = document.getElementById('btn-submit-prompt');
-        submitBtn.querySelector('.btn-text').textContent = data ? 'Salvar Alterações' : 'Criar Prompt';
-
-        if (data) {
-            document.getElementById('p-titulo').value = data.titulo || '';
-            document.getElementById('p-descricao').value = data.descricao || '';
-            document.getElementById('p-prompt').value = data.prompt || '';
-            document.getElementById('p-categoria').value = data.categoria || 'ARTE';
-            document.getElementById('p-imagem-url').value = data.imagem_url || '';
+        if (submitBtn) {
+            const textEl = submitBtn.querySelector('.btn-text');
+            if (textEl) textEl.textContent = data ? 'Salvar Alterações' : 'Criar Prompt';
         }
 
-        elements.modalPrompt.classList.add('active');
-        setTimeout(() => document.getElementById('p-titulo').focus(), 80);
+        if (data) {
+            if (document.getElementById('p-titulo')) document.getElementById('p-titulo').value = data.titulo || '';
+            if (document.getElementById('p-descricao')) document.getElementById('p-descricao').value = data.descricao || '';
+            if (document.getElementById('p-prompt')) document.getElementById('p-prompt').value = data.prompt || '';
+            if (document.getElementById('p-categoria')) document.getElementById('p-categoria').value = data.categoria || 'ARTE';
+            if (document.getElementById('p-imagem-url')) document.getElementById('p-imagem-url').value = data.imagem_url || '';
+        }
 
-    } else if (type === 'anotacao') {
+        if (elements.modalPrompt) {
+            elements.modalPrompt.classList.add('active');
+            setTimeout(() => {
+                const focusEl = document.getElementById('p-titulo');
+                if (focusEl) focusEl.focus();
+            }, 80);
+        }
+    }
+    else if (type === 'anotacao') {
         const form = document.getElementById('form-anotacao');
-        form.reset();
+        if (form) form.reset();
         hideFormError('anotacao-error-msg');
         document.getElementById('anotacao-id').value = data ? data.id : '';
         document.getElementById('anotacao-modal-title').innerText = data ? 'Editar Anotação' : 'Nova Anotação';
         const submitBtn = document.getElementById('btn-submit-anotacao');
-        submitBtn.querySelector('.btn-text').textContent = data ? 'Salvar Alterações' : 'Criar';
-
-        if (data) {
-            document.getElementById('a-titulo').value = data.titulo || '';
-            document.getElementById('a-tag').value = data.tag || 'Dicas';
-            document.getElementById('a-conteudo').value = data.conteudo || '';
+        if (submitBtn) {
+            const textEl = submitBtn.querySelector('.btn-text');
+            if (textEl) textEl.textContent = data ? 'Salvar Alterações' : 'Salvar Nota';
         }
 
-        elements.modalAnotacao.classList.add('active');
-        setTimeout(() => document.getElementById('a-titulo').focus(), 80);
+        if (data) {
+            if (document.getElementById('a-titulo')) document.getElementById('a-titulo').value = data.titulo || '';
+            if (document.getElementById('a-tag')) document.getElementById('a-tag').value = data.tag || 'Dicas';
+            if (document.getElementById('a-conteudo')) document.getElementById('a-conteudo').value = data.conteudo || '';
+        }
+
+        if (elements.modalAnotacao) {
+            elements.modalAnotacao.classList.add('active');
+            setTimeout(() => {
+                const focusEl = document.getElementById('a-titulo');
+                if (focusEl) focusEl.focus();
+            }, 80);
+        }
     }
 }
 
@@ -712,15 +816,15 @@ function closeModal() {
 function setSubmitLoading(btnId, loading, loadingText = 'Processando...') {
     const btn = document.getElementById(btnId);
     if (!btn) return;
-    const textEl = btn.querySelector('.btn-text');
+    const contentEl = btn.querySelector('.btn-content') || btn;
     const spinEl = btn.querySelector('.btn-spinner');
     btn.disabled = loading;
-    if (textEl) {
+    if (contentEl) {
         if (loading) {
-            if (!btn.dataset.originalText) btn.dataset.originalText = textEl.textContent;
-            textEl.textContent = loadingText;
+            if (!btn.dataset.originalText) btn.dataset.originalText = contentEl.innerHTML;
+            contentEl.innerHTML = `<span>${loadingText}</span>`;
         } else {
-            textEl.textContent = btn.dataset.originalText || textEl.textContent;
+            contentEl.innerHTML = btn.dataset.originalText || contentEl.innerHTML;
         }
     }
     if (spinEl) spinEl.classList.toggle('hidden', !loading);
@@ -851,12 +955,16 @@ window.copyPrompt = async (id) => {
     if (promptObj) {
         try {
             await navigator.clipboard.writeText(promptObj.prompt);
-            const card = document.getElementById(`card-${id}`);
-            if (card) {
-                card.classList.add('copied');
-                setTimeout(() => card.classList.remove('copied'), 1600);
+            const overlay = document.getElementById(`copy-overlay-${id}`);
+            if (overlay) {
+                overlay.style.opacity = '1';
+                overlay.style.pointerEvents = 'auto';
+                setTimeout(() => {
+                    overlay.style.opacity = '0';
+                    overlay.style.pointerEvents = 'none';
+                }, 1600);
             }
-            showToast('Copiado para a área de transferência!', 'info');
+            showToast('Copiado para a área de transferência!', 'success');
         } catch {
             showToast('Não foi possível copiar.', 'error');
         }
@@ -931,16 +1039,20 @@ window.viewPrompt = (id) => {
     document.getElementById('view-content').innerText = promptObj.prompt;
 
     const copyBtn = document.getElementById('btn-copy-prompt');
-    copyBtn.textContent = 'Copiar Prompt';
-    copyBtn.classList.remove('copied');
-
+    copyBtn.innerHTML = 'Copiar Prompt';
+    
     const imgContainer = document.getElementById('view-image-container');
     if (promptObj.imagem_url) {
-        imgContainer.innerHTML = `<img src="${promptObj.imagem_url}" loading="lazy" alt="${promptObj.titulo}"
-            onerror="this.parentElement.innerHTML='<span style=\\'color:var(--text-muted)\\'>Imagem indisponível</span>'">`;
+        imgContainer.innerHTML = `<img src="${promptObj.imagem_url}" loading="lazy" class="w-full h-full object-cover" alt="${promptObj.titulo}"
+            onerror="this.parentElement.innerHTML='<span class=\\'text-gray-600 font-bold uppercase tracking-widest text-xs\\'>Imagem indisponível</span>'">`;
         imgContainer.classList.remove('hidden');
     } else {
-        imgContainer.classList.add('hidden');
+        imgContainer.innerHTML = `<div class="w-full h-full flex flex-col items-center justify-center bg-white/5 text-gray-700 p-12 text-center">
+            <i data-lucide="image-off" class="w-12 h-12 mb-4 opacity-20"></i>
+            <span class="text-[10px] font-bold uppercase tracking-widest">Sem Imagem de Referência</span>
+        </div>`;
+        imgContainer.classList.remove('hidden');
+        lucide.createIcons({ root: imgContainer });
     }
 
     elements.modalViewPrompt.classList.add('active');

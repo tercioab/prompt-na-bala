@@ -6,16 +6,35 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // --- AUTH ---
-export async function cadastrarUsuario(email, password, metadata) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: metadata
+export async function cadastrarUsuario(email, password, metadata = {}) {
+    const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+            data: metadata,
+            emailRedirectTo: window.location.origin
+        }
+    });
+    if (error) {
+        console.error("Erro no cadastro:", error);
+        throw error;
     }
-  });
-  if (error) throw error;
-  return data;
+    return data;
+}
+
+/**
+ * Vincula dados que não têm user_id ao usuário atual (migração legada).
+ */
+export async function vincularDadosLegados() {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        
+        const { error } = await supabase.rpc('vincular_dados_orfaos', { uid: session.user.id });
+        if (error) console.error("Erro ao vincular dados legados:", error);
+    } catch (err) {
+        console.error("Falha na chamada de vinculação:", err);
+    }
 }
 
 export async function loginUsuario(email, password) {
@@ -41,27 +60,36 @@ export async function reenviarConfirmacao(email) {
 }
 
 // --- PROMPTS ---
-export async function buscarPrompts(categoria = 'TODOS') {
-  let query = supabase.from('prompts').select('*').order('created_at', { ascending: false });
-  if (categoria !== 'TODOS') {
-    query = query.eq('categoria', categoria);
-  }
-  const { data, error } = await query;
-  if (error) throw error;
-  return data;
+export async function buscarPrompts() {
+    const { data, error } = await supabase
+        .from('prompts')
+        .select('*')
+        .order('created_at', { ascending: false });
+    
+    if (error) {
+        console.error("Erro ao buscar prompts:", error);
+        throw error;
+    }
+    return data || [];
 }
 
 export async function criarPrompt(dados) {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) throw new Error('Usuário não autenticado');
-
-  const { data, error } = await supabase
-    .from('prompts')
-    .insert([{ ...dados, user_id: session.user.id }])
-    .select();
-  
-  if (error) throw error;
-  return data[0];
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+        console.error("Tentativa de criar prompt sem sessão ativa.");
+        throw new Error("Sessão expirada ou não encontrada. Por favor, faça login novamente.");
+    }
+    
+    const { data, error } = await supabase
+        .from('prompts')
+        .insert([{ ...dados, user_id: session.user.id }])
+        .select();
+    
+    if (error) {
+        console.error("Erro ao inserir prompt no Supabase:", error);
+        throw error;
+    }
+    return data && data.length > 0 ? data[0] : null;
 }
 
 export async function editarPrompt(id, dados) {
@@ -77,27 +105,33 @@ export async function deletarPrompt(id) {
 }
 
 // --- ANOTAÇÕES ---
-export async function buscarAnotacoes(tag = 'Todos') {
-  let query = supabase.from('anotacoes').select('*').order('created_at', { ascending: false });
-  if (tag !== 'Todos') {
-    query = query.eq('tag', tag);
-  }
-  const { data, error } = await query;
-  if (error) throw error;
-  return data;
+export async function buscarAnotacoes() {
+    const { data, error } = await supabase
+        .from('anotacoes')
+        .select('*')
+        .order('created_at', { ascending: false });
+    
+    if (error) {
+        console.error("Erro ao buscar anotações:", error);
+        throw error;
+    }
+    return data || [];
 }
 
 export async function criarAnotacao(dados) {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) throw new Error('Usuário não autenticado');
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error("Usuário não autenticado.");
 
-  const { data, error } = await supabase
-    .from('anotacoes')
-    .insert([{ ...dados, user_id: session.user.id }])
-    .select();
-  
-  if (error) throw error;
-  return data[0];
+    const { data, error } = await supabase
+        .from('anotacoes')
+        .insert([{ ...dados, user_id: session.user.id }])
+        .select();
+    
+    if (error) {
+        console.error("Erro ao inserir anotação no Supabase:", error);
+        throw error;
+    }
+    return data && data.length > 0 ? data[0] : null;
 }
 
 export async function editarAnotacao(id, dados) {

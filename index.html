@@ -1,334 +1,445 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PV | PromptVault</title>
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/src/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PV | PROMPT NA BALA</title>
+  
+  <!-- Fonts: System.X Standard -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;700;800&family=Space+Mono&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind & Main Style -->
+  <link rel="stylesheet" href="/src/style.css">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="loading">
-    <!-- Tela de Verificação Inicial (Loading App) -->
-    <div id="app-loader" class="screen-overlay">
-        <div class="loader-content">
-            <div class="logo logo-large">
-                <span class="logo-text">PV</span>
-            </div>
-            <div class="loader-spinner"></div>
+
+<body class="loading antialiased selection:bg-primary/30 selection:text-white">
+
+  <!-- Progressive Blur Top for Navbar -->
+  <div class="gradient-blur"></div>
+
+  <!-- BACKGROUND SYSTEM -->
+  <div class="fixed inset-0 z-[-2] bg-[#080808]"></div>
+  
+  <!-- Unicorn Studio Animated Background -->
+  <div class="fixed inset-0 z-[-1] pointer-events-none opacity-60 mix-blend-screen"
+      style="mask-image: linear-gradient(to bottom, black 0%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);">
+      <div data-us-project="sajpUiTp7MIKdX6daDCu" class="w-full h-full"></div>
+      <script>
+          !function () { if (!window.UnicornStudio) { window.UnicornStudio = { isInitialized: !1 }; var i = document.createElement("script"); i.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.29/dist/unicornStudio.umd.js", i.onload = function () { window.UnicornStudio.isInitialized || (UnicornStudio.init(), window.UnicornStudio.isInitialized = !0) }, (document.head || document.body).appendChild(i) } }();
+      </script>
+  </div>
+  
+  <!-- Decorative Beams -->
+  <div class="fixed inset-0 z-[-1] flex justify-around pointer-events-none opacity-30">
+      <div class="relative h-full w-px border-l border-white/5">
+          <div class="beam h-64 delay-1"></div>
+      </div>
+      <div class="relative h-full w-px border-l border-white/5">
+          <div class="beam h-96 delay-2"></div>
+      </div>
+      <div class="relative h-full w-px border-l border-white/5">
+          <div class="beam h-48 delay-3"></div>
+      </div>
+      <div class="relative h-full w-px border-l border-white/5">
+          <div class="beam h-80 delay-1"></div>
+      </div>
+  </div>
+
+  <!-- Ambient Light Glows -->
+  <div class="ambient-light top-[-10%] left-[-10%] opacity-40"></div>
+  <div class="ambient-light bottom-[-10%] right-[-10%] opacity-30" style="animation-delay: -3s;"></div>
+
+  <!-- INITIAL LOADER (System.X Style) -->
+  <div id="app-loader" class="fixed inset-0 z-[10000] bg-black flex flex-col items-center justify-center transition-all duration-500">
+    <div class="relative">
+      <div class="w-24 h-24 rounded-full border-t-2 border-primary animate-spin"></div>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <span class="text-2xl font-bold font-manrope text-white">PV</span>
+      </div>
+    </div>
+    <p class="mt-6 text-gray-500 font-mono text-xs tracking-[0.3em] animate-pulse">CARREGANDO SISTEMA...</p>
+  </div>
+
+  <!-- TELA DE AUTENTICAÇÃO -->
+  <div id="auth-screen" class="fixed inset-0 z-[5000] flex items-center justify-center p-6 hidden">
+    <div class="w-full max-w-md glass-panel p-10 rounded-[2rem] shadow-2xl animate-fade-slide">
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-4 border border-primary/20 rotate-3 group hover:rotate-0 transition-transform">
+          <span class="text-3xl font-bold text-primary font-manrope">PV</span>
         </div>
+        <h1 class="text-3xl font-manrope font-extrabold tracking-tighter text-white">PROMPT NA BALA</h1>
+        <p class="text-gray-400 text-sm mt-2 font-light">Seu cofre de inteligência artificial</p>
+      </div>
+
+      <!-- Login -->
+      <div id="auth-login">
+        <form id="form-login" class="space-y-6">
+          <div class="space-y-2">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-widest ml-1">Email</label>
+            <input type="email" id="l-email" placeholder="seu@email.com" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-primary/50 transition-all placeholder:text-gray-600" required>
+          </div>
+          <div class="space-y-2">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-widest ml-1">Senha</label>
+            <div class="relative group">
+              <input type="password" id="l-password" placeholder="••••••••" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-primary/50 transition-all placeholder:text-gray-600" required>
+              <button type="button" class="btn-toggle-pass absolute right-4 top-1/2 -translate-y-1/2 opacity-40 hover:opacity-100 transition-opacity" tabindex="-1">
+                <i data-lucide="eye"></i>
+              </button>
+            </div>
+            <p id="l-error" class="text-red-500 text-xs mt-2 px-2 hidden"></p>
+          </div>
+          <button type="submit" id="btn-login-submit" class="btn-particle w-full group">
+            <span class="btn-content">
+              Entrar
+              <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1"></i>
+            </span>
+            <span class="btn-spinner hidden ml-2">⟳</span>
+          </button>
+        </form>
+        <p class="text-center mt-8 text-sm text-gray-500">
+          Não tem conta? <a href="#" id="go-to-signup" class="text-primary font-semibold hover:underline">Cadastre-se</a>
+        </p>
+      </div>
+
+      <!-- Cadastro -->
+      <div id="auth-signup" class="hidden">
+        <form id="form-signup" class="space-y-4">
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Nome</label>
+            <input type="text" id="s-nome" placeholder="Seu nome" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/40 transition-all" required>
+            <p id="s-error-nome" class="text-red-500 text-[10px] hidden"></p>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Email</label>
+            <input type="email" id="s-email" placeholder="seu@email.com" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/40 transition-all" required>
+            <p id="s-error-email" class="text-red-500 text-[10px] hidden"></p>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Senha</label>
+            <div class="relative">
+              <input type="password" id="s-password" placeholder="Mínimo 6 caracteres" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/40 transition-all" required>
+              <button type="button" class="btn-toggle-pass absolute right-4 top-1/2 -translate-y-1/2 opacity-30" tabindex="-1"><i data-lucide="eye" class="w-4 h-4"></i></button>
+            </div>
+            <p id="s-error-password" class="text-red-500 text-[10px] hidden"></p>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Confirmar Senha</label>
+            <input type="password" id="s-confirm" placeholder="••••••••" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/40 transition-all" required>
+            <p id="s-error-confirm" class="text-red-500 text-[10px] hidden"></p>
+          </div>
+          <p id="s-error-general" class="text-red-500 text-xs hidden text-center"></p>
+          <button type="submit" id="btn-signup-submit" class="btn-particle w-full mt-4">
+            <span class="btn-content">Criar conta</span>
+            <span class="btn-spinner hidden ml-2">⟳</span>
+          </button>
+        </form>
+        <p class="text-center mt-6 text-sm text-gray-500">
+          Já tem conta? <a href="#" id="go-to-login" class="text-primary font-semibold hover:underline">Entrar</a>
+        </p>
+      </div>
     </div>
+  </div>
 
-    <!-- TELA DE AUTENTICAÇÃO -->
-    <div id="auth-screen" class="screen-overlay hidden">
-        <div class="auth-card">
-            <div class="logo logo-centered">
-                <span class="logo-text">PV</span>
-                <span class="logo-full">PromptVault</span>
-            </div>
-            
-            <!-- Login -->
-            <div id="auth-login">
-                <h2 class="auth-title">Entrar</h2>
-                <form id="form-login">
-                    <div class="form-group">
-                        <label for="l-email">Email</label>
-                        <input type="email" id="l-email" placeholder="seu@email.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="l-password">Senha</label>
-                        <div class="input-with-icon">
-                            <input type="password" id="l-password" placeholder="••••••••" required>
-                            <button type="button" class="btn-toggle-pass" tabindex="-1">👁</button>
-                        </div>
-                        <p id="l-error" class="form-error hidden"></p>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-full" id="btn-login-submit">
-                        <span class="btn-text">Entrar</span>
-                        <span class="btn-spinner hidden">⟳</span>
-                    </button>
-                </form>
-                <p class="auth-switch">
-                    Não tem conta? <a href="#" id="go-to-signup">Cadastre-se</a>
-                </p>
-            </div>
+  <!-- TELA DE CONFIRMAÇÃO PENDENTE -->
+  <div id="pending-screen" class="fixed inset-0 z-[6000] flex items-center justify-center p-6 hidden">
+    <div class="w-full max-w-sm glass-panel p-10 rounded-[2rem] text-center animate-fade-slide">
+      <div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-primary/30">
+        <i data-lucide="mail" class="w-10 h-10 text-primary"></i>
+      </div>
+      <h2 class="text-2xl font-manrope font-bold mb-4">Confirme seu email</h2>
+      <p class="text-gray-400 text-sm mb-8 leading-relaxed">
+        Enviamos um link de confirmação para <strong id="pending-user-email" class="text-white"></strong>.<br>
+        Acesse sua caixa de entrada e ative sua conta.
+      </p>
+      <div class="space-y-4">
+        <button id="btn-resend-email" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl py-4 text-white font-semibold transition-all">
+          Reenviar email
+        </button>
+        <a href="#" id="resend-back-to-login" class="block text-sm text-gray-500 hover:text-primary transition-colors">Voltar para o login</a>
+      </div>
+    </div>
+  </div>
 
-            <!-- Cadastro -->
-            <div id="auth-signup" class="hidden">
-                <h2 class="auth-title">Criar Conta</h2>
-                <form id="form-signup">
-                    <div class="form-group">
-                        <label for="s-nome">Nome</label>
-                        <input type="text" id="s-nome" placeholder="Seu nome" required>
-                        <p id="s-error-nome" class="form-error hidden"></p>
-                    </div>
-                    <div class="form-group">
-                        <label for="s-email">Email</label>
-                        <input type="email" id="s-email" placeholder="seu@email.com" required>
-                        <p id="s-error-email" class="form-error hidden"></p>
-                    </div>
-                    <div class="form-group">
-                        <label for="s-password">Senha</label>
-                        <div class="input-with-icon">
-                            <input type="password" id="s-password" placeholder="Mínimo 6 caracteres" required>
-                            <button type="button" class="btn-toggle-pass" tabindex="-1">👁</button>
-                        </div>
-                        <p id="s-error-password" class="form-error hidden"></p>
-                    </div>
-                    <div class="form-group">
-                        <label for="s-confirm">Confirmar Senha</label>
-                        <input type="password" id="s-confirm" placeholder="••••••••" required>
-                        <p id="s-error-confirm" class="form-error hidden"></p>
-                    </div>
-                    <p id="s-error-general" class="form-error hidden" style="margin-bottom: 1.5rem;"></p>
-                    <button type="submit" class="btn btn-primary btn-full" id="btn-signup-submit">
-                        <span class="btn-text">Criar conta</span>
-                        <span class="btn-spinner hidden">⟳</span>
-                    </button>
-                </form>
-                <p class="auth-switch">
-                    Já tem conta? <a href="#" id="go-to-login">Entrar</a>
-                </p>
-            </div>
+  <!-- APP INTERFACE -->
+  <div id="app-interface" class="relative z-10 hidden">
+    
+    <!-- Floating Navbar -->
+    <!-- Floating Navbar -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-[95%] max-w-4xl glass-panel rounded-full px-6 py-3 flex items-center justify-between shadow-2xl animate-fade-slide pointer-events-auto">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-bold font-manrope">PV</div>
+        <span class="hidden md:block font-manrope font-bold text-sm tracking-tight">PROMPT<span class="text-primary">.X</span></span>
+      </div>
+      
+      <div class="flex items-center gap-1 bg-white/5 rounded-full p-1">
+        <button id="nav-prompts" class="nav-btn-new active" data-lucide="layout-grid" title="Prompts"></button>
+        <button id="nav-anotacoes" class="nav-btn-new" data-lucide="file-text" title="Anotações"></button>
+      </div>
+
+      <div class="relative group">
+        <button id="user-avatar" class="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center font-bold text-primary hover:bg-primary transition-all hover:text-white">
+          <span id="user-initial">U</span>
+        </button>
+        
+        <!-- User Dropdown (System.X Style) -->
+        <div id="user-dropdown" class="absolute top-full right-0 mt-3 w-64 glass-panel rounded-2xl p-4 shadow-2xl hidden origin-top-right transition-all">
+          <div class="mb-4 px-2">
+            <p id="dropdown-user-name" class="font-bold text-white text-sm truncate"></p>
+            <p id="dropdown-user-email" class="text-xs text-gray-500 truncate mt-0.5"></p>
+          </div>
+          <div class="h-px bg-white/5 my-3"></div>
+          <button id="btn-logout" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-primary/10 text-red-400 transition-all font-semibold text-sm">
+            <span>Encerrar Sessão</span>
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
         </div>
-    </div>
+      </div>
+    </nav>
 
-    <!-- TELA DE CONFIRMAÇÃO PENDENTE -->
-    <div id="pending-screen" class="screen-overlay hidden">
-        <div class="auth-card text-center">
-            <div class="logo logo-centered">
-                <span class="logo-text">PV</span>
+    <main class="container mx-auto px-6 pt-32 pb-20">
+      
+      <!-- Section: PROMPTS -->
+      <section id="section-prompts" class="animate-fade-slide">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div class="space-y-2">
+            <div class="flex items-center gap-3 text-primary font-mono text-xs tracking-[0.4em] uppercase">
+              <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+              Sistema de Prompts
             </div>
-            <div class="pending-icon">✉️</div>
-            <h2 class="auth-title">Confirme seu email</h2>
-            <p class="pending-text">
-                Enviamos um link de confirmação para <strong id="pending-user-email"></strong>.<br>
-                Acesse seu email e clique no link para ativar sua conta.
-            </p>
-            <button id="btn-resend-email" class="btn btn-secondary btn-full">
-                Reenviar email
-            </button>
-            <p class="auth-switch">
-                <a href="#" id="resend-back-to-login">Voltar para o login</a>
-            </p>
-        </div>
-    </div>
-
-    <!-- APP PRINCIPAL -->
-    <div id="app-interface" class="hidden">
-        <header class="main-header">
-            <div class="container header-content">
-                <div class="logo">
-                    <span class="logo-text">PV</span>
-                    <span class="logo-full">PromptVault</span>
-                </div>
-                <nav class="main-nav">
-                    <button id="nav-prompts" class="nav-btn active">PROMPTS</button>
-                    <button id="nav-anotacoes" class="nav-btn">ANOTAÇÕES</button>
-                </nav>
-                <div class="user-menu-container">
-                    <button id="user-avatar" class="avatar">
-                        <span id="user-initial">U</span>
-                    </button>
-                    <div id="user-dropdown" class="user-dropdown hidden">
-                        <div class="dropdown-header">
-                            <p id="dropdown-user-name" class="user-name"></p>
-                            <p id="dropdown-user-email" class="user-email"></p>
-                        </div>
-                        <hr>
-                        <button id="btn-logout" class="dropdown-item danger">
-                            <span>Sair</span>
-                            <span>退出</span>
-                        </button>
-                    </div>
-                </div>
+            <h1 class="text-4xl md:text-6xl font-manrope font-extrabold tracking-tighter">MINHA COLEÇÃO</h1>
+            <p id="prompt-counter" class="text-gray-500 text-sm font-medium">0 prompts sincronizados</p>
+          </div>
+          <button id="btn-new-prompt" class="shiny-cta group p-0 min-w-[180px] h-[52px]">
+            <div class="btn-aura-glow btn-aura-glow-default"></div>
+            <div class="btn-aura-border"><div class="aura-spinner"></div></div>
+            <div class="btn-aura-inner"></div>
+            <div class="points_wrapper">
+                <div class="point"></div><div class="point"></div><div class="point"></div>
+                <div class="point"></div><div class="point"></div>
             </div>
-        </header>
-
-        <main class="container">
-            <!-- Section: PROMPTS -->
-            <section id="section-prompts" class="page-section">
-                <div class="section-header">
-                    <div>
-                        <h1>Minha Coleção</h1>
-                        <p id="prompt-counter" class="counter">0 prompts salvos</p>
-                    </div>
-                    <button id="btn-new-prompt" class="btn btn-primary">+ Novo Prompt</button>
-                </div>
-
-                <div id="prompt-filters" class="filters-bar"></div>
-
-                <div id="prompts-grid" class="grid-prompts"></div>
-            </section>
-
-            <!-- Section: ANOTAÇÕES -->
-            <section id="section-anotacoes" class="page-section hidden">
-                <div class="section-header">
-                    <div>
-                        <h1>Anotações</h1>
-                        <p id="anotacao-counter" class="counter">0 anotações salvas</p>
-                    </div>
-                    <button id="btn-new-anotacao" class="btn btn-primary">+ Nova</button>
-                </div>
-
-                <div id="anotacao-filters" class="filters-bar"></div>
-
-                <div id="anotacoes-grid" class="grid-anotacoes"></div>
-            </section>
-        </main>
-    </div>
-
-    <!-- Modais do sistema CRUD -->
-    <!-- Modal: Novo/Editar Prompt -->
-    <div id="modal-prompt" class="modal">
-        <div class="modal-content">
-            <h2 class="mono">[ <span id="prompt-modal-title">Novo Prompt</span> ]</h2>
-            <form id="form-prompt">
-                <input type="hidden" id="prompt-id">
-                <div class="form-group">
-                    <label for="p-titulo">Título*</label>
-                    <input type="text" id="p-titulo" placeholder="Ex: Retrato Cyberpunk" required>
-                </div>
-                <div class="form-group">
-                    <label for="p-descricao">Descrição</label>
-                    <input type="text" id="p-descricao" placeholder="Breve descrição do uso">
-                </div>
-                <div class="form-group">
-                    <label for="p-prompt">Prompt*</label>
-                    <textarea id="p-prompt" rows="5" placeholder="Digite seu prompt completo aqui..." required></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group flex-1">
-                        <label for="p-categoria">Categoria</label>
-                        <div class="select-wrapper">
-                            <select id="p-categoria">
-                                <option value="ARTE">ARTE</option>
-                                <option value="FOTOGRAFIA">FOTOGRAFIA</option>
-                                <option value="ESCRITA">ESCRITA</option>
-                                <option value="CÓDIGO">CÓDIGO</option>
-                                <option value="MARKETING">MARKETING</option>
-                                <option value="NEGÓCIOS">NEGÓCIOS</option>
-                                <option value="EDUCAÇÃO">EDUCAÇÃO</option>
-                            </select>
-                            <button type="button" id="btn-add-cat" class="btn-small">+ Cat.</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Imagem (URL ou Arquivo)</label>
-                    <div style="display: flex; gap: 10px; flex-direction: column;">
-                        <input type="text" id="p-imagem-url" placeholder="Colar link da imagem...">
-                        <p style="text-align: center; margin: 5px 0; opacity: 0.5; font-size: 0.8rem;">- OU -</p>
-                        <label for="p-imagem-file" class="btn btn-secondary" style="display: block; text-align: center; cursor: pointer; padding: 10px; font-size: 0.9rem;">
-                            📷 Carregar do Dispositivo
-                        </label>
-                        <input type="file" id="p-imagem-file" accept="image/*" style="display: none;">
-                        <div id="file-chosen" style="text-align: center; font-size: 0.8rem; color: var(--accent-color); min-height: 1.2em;">Nenhum arquivo selecionado</div>
-                    </div>
-                </div>
-                <div class="form-group" id="prompt-error-msg" style="display:none;">
-                    <p class="form-error"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary close-modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" id="btn-submit-prompt">
-                        <span class="btn-text">Criar Prompt</span>
-                        <span class="btn-spinner hidden">⟳</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal: Nova/Editar Anotação -->
-    <div id="modal-anotacao" class="modal">
-        <div class="modal-content">
-            <h2 class="mono">[ <span id="anotacao-modal-title">Nova Anotação</span> ]</h2>
-            <form id="form-anotacao">
-                <input type="hidden" id="anotacao-id">
-                <div class="form-group">
-                    <label for="a-titulo">Título</label>
-                    <input type="text" id="a-titulo" placeholder="Título da nota">
-                </div>
-                <div class="form-group">
-                    <label for="a-tag">Tag</label>
-                    <div class="select-wrapper">
-                        <select id="a-tag">
-                            <option value="Ângulos">Ângulos</option>
-                            <option value="Iluminação">Iluminação</option>
-                            <option value="Composição">Composição</option>
-                            <option value="Dicas">Dicas</option>
-                            <option value="Estilos">Estilos</option>
-                            <option value="Câmera">Câmera</option>
-                            <option value="links">links</option>
-                        </select>
-                        <button type="button" id="btn-add-tag" class="btn-small">+ Tag</button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="a-conteudo">Conteúdo</label>
-                    <textarea id="a-conteudo" rows="8" placeholder="Escreva suas notas ou cole links aqui..."></textarea>
-                </div>
-                <div class="form-group" id="anotacao-error-msg" style="display:none;">
-                    <p class="form-error"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary close-modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" id="btn-submit-anotacao">
-                        <span class="btn-text">Criar</span>
-                        <span class="btn-spinner hidden">⟳</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Outros modais customizados... -->
-    <div id="modal-view-prompt" class="modal">
-        <div class="modal-content modal-large">
-            <div class="modal-header-view">
-                <h2 id="view-title" class="mono"></h2>
-                <button class="close-modal btn-icon-close">&times;</button>
+            <div class="btn-content relative z-10 flex items-center justify-center gap-2 px-6">
+              <i data-lucide="plus" class="w-5 h-5"></i>
+              <span>Novo Prompt</span>
             </div>
-            <div class="view-body">
-                <div id="view-image-container" class="view-image"></div>
-                <div class="view-details">
-                    <span id="view-category" class="badge"></span>
-                    <p id="view-description" class="view-desc"></p>
-                    <div class="prompt-box">
-                        <pre id="view-content"></pre>
-                        <button id="btn-copy-prompt" class="btn-copy">Copiar Prompt</button>
-                    </div>
-                </div>
-            </div>
+          </button>
         </div>
-    </div>
 
-    <!-- Confirm/Input Modals -->
-    <div id="modal-confirm" class="modal modal-confirm-overlay">
-        <div class="modal-confirm-box">
-            <p id="modal-confirm-msg" class="modal-confirm-msg">Tem certeza?</p>
-            <div class="modal-confirm-actions">
-                <button id="modal-confirm-cancel" class="btn btn-secondary">Cancelar</button>
-                <button id="modal-confirm-ok" class="btn btn-danger">Excluir</button>
+        <div id="prompt-filters" class="flex gap-2 flex-wrap mb-10 overflow-x-auto pb-2 scrollbar-none"></div>
+        <div id="prompts-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+      </section>
+
+      <!-- Section: ANOTAÇÕES -->
+      <section id="section-anotacoes" class="animate-fade-slide hidden">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div class="space-y-2">
+            <div class="flex items-center gap-3 text-secondary font-mono text-xs tracking-[0.4em] uppercase">
+              <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+              Base de Conhecimento
             </div>
-        </div>
-    </div>
-    <div id="modal-input" class="modal modal-confirm-overlay">
-        <div class="modal-confirm-box">
-            <p class="modal-confirm-msg" id="modal-input-label">Nome:</p>
-            <input type="text" id="modal-input-field" class="modal-input-field">
-            <div class="modal-confirm-actions">
-                <button id="modal-input-cancel" class="btn btn-secondary">Cancelar</button>
-                <button id="modal-input-ok" class="btn btn-primary">Adicionar</button>
+            <h1 class="text-4xl md:text-6xl font-manrope font-extrabold tracking-tighter">ANOTAÇÕES</h1>
+            <p id="anotacao-counter" class="text-gray-500 text-sm font-medium">0 notas registradas</p>
+          </div>
+          <button id="btn-new-anotacao" class="shiny-cta group p-0 min-w-[180px] h-[52px]" style="background: radial-gradient(65% 65% at 50% 100%, rgba(234, 88, 12, 0.4) 0%, rgba(234, 88, 12, 0.9) 100%), #d97706;">
+            <div class="btn-aura-glow" style="background: radial-gradient(20% 50% at 50% 100%, rgba(234, 88, 12, 0.5) 0%, rgba(234, 88, 12, 0) 100%); opacity: 1; filter: blur(10px);"></div>
+            <div class="btn-aura-border"><div class="aura-spinner" style="background: conic-gradient(from 90deg at 50% 50%, transparent 0%, transparent 90%, #ea580c 100%);"></div></div>
+            <div class="btn-aura-inner"></div>
+            <div class="btn-content relative z-10 flex items-center justify-center gap-2 px-6 text-white font-bold">
+              <i data-lucide="plus" class="w-5 h-5"></i>
+              <span>Criar Nota</span>
             </div>
+          </button>
         </div>
+
+        <div id="anotacao-filters" class="flex gap-2 flex-wrap mb-10 overflow-x-auto pb-2 scrollbar-none"></div>
+        <div id="anotacoes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODALS SYSTEM (System.X Style) -->
+  
+  <!-- Modal Custom Styles for IDs -->
+  <style>
+    .modal-background { @apply fixed inset-0 z-[7000] bg-black/80 backdrop-blur-md items-center justify-center p-4 transition-all duration-300 hidden; }
+    .modal-background.active { display: flex; }
+    .nav-btn-new { @apply w-12 h-12 rounded-full flex items-center justify-center transition-all text-gray-500 hover:text-white hover:bg-white/10 hover:scale-110 active:scale-95 cursor-pointer relative z-10; }
+    .nav-btn-new.active { @apply bg-white/15 text-white shadow-[0_0_20px_rgba(255,255,255,0.1)] border border-white/10; }
+    .nav-btn-new.active::after { content: ""; @apply absolute -bottom-1 w-1 h-1 bg-primary rounded-full; }
+    .scrollbar-none::-webkit-scrollbar { display: none; }
+    .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+
+  <!-- Modal: Novo/Editar Prompt -->
+  <div id="modal-prompt" class="modal-background">
+    <div class="modal-content-new max-w-xl">
+      <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+        <h2 class="text-xl font-manrope font-extrabold tracking-tight">[ <span id="prompt-modal-title">Novo Prompt</span> ]</h2>
+        <button class="close-modal text-gray-500 hover:text-white p-2"><i data-lucide="x"></i></button>
+      </div>
+      <form id="form-prompt" class="space-y-5">
+        <input type="hidden" id="prompt-id">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Título</label>
+            <input type="text" id="p-titulo" placeholder="Ex: Retrato Cyberpunk" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/40 transition-all" required>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Categoria</label>
+            <div class="relative flex gap-2">
+              <select id="p-categoria" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white appearance-none focus:outline-none focus:border-primary/40 transition-all">
+                <option value="ARTE">ARTE</option><option value="FOTOGRAFIA">FOTOGRAFIA</option><option value="ESCRITA">ESCRITA</option><option value="CÓDIGO">CÓDIGO</option>
+                <option value="MARKETING">MARKETING</option><option value="NEGÓCIOS">NEGÓCIOS</option><option value="EDUCAÇÃO">EDUCAÇÃO</option>
+              </select>
+              <button type="button" id="btn-add-cat" class="bg-white/5 border border-white/10 px-3 rounded-xl hover:bg-white/10 transition-all">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Descrição</label>
+          <input type="text" id="p-descricao" placeholder="Breve descrição do uso" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/40 transition-all">
+        </div>
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Prompt</label>
+          <textarea id="p-prompt" rows="5" placeholder="Digite seu prompt completo aqui..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/40 transition-all font-mono text-sm" required></textarea>
+        </div>
+        <div class="space-y-1 pt-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1 leading-8">Imagem de Referência</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <input type="text" id="p-imagem-url" placeholder="URL da imagem..." class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-primary/40 transition-all">
+            <label for="p-imagem-file" class="bg-white/5 border border-dashed border-white/20 rounded-xl flex items-center justify-center gap-2 cursor-pointer hover:bg-white/10 transition-all text-xs font-semibold py-3 text-gray-400">
+              <i data-lucide="upload" class="w-4 h-4"></i> Carregar Local
+            </label>
+            <input type="file" id="p-imagem-file" accept="image/*" class="hidden">
+          </div>
+          <div id="file-chosen" class="text-[10px] text-primary mt-1 px-1 h-3"></div>
+        </div>
+        <p id="prompt-error-msg" class="text-red-500 text-[10px] hidden"></p>
+        <div class="flex justify-end gap-3 pt-6 border-t border-white/5 mt-4">
+          <button type="button" class="close-modal px-6 py-3 rounded-full text-sm font-semibold text-gray-400 hover:text-white transition-all">Cancelar</button>
+          <button type="submit" id="btn-submit-prompt" class="btn-particle group px-8">
+            <span class="btn-content">
+              <span class="btn-text">Salvar Prompt</span>
+              <span class="btn-spinner hidden ml-2">⟳</span>
+            </span>
+          </button>
+        </div>
+      </form>
     </div>
+  </div>
 
-    <div id="toast-container" class="toast-container"></div>
+  <!-- Modal: Nova/Editar Anotação -->
+  <div id="modal-anotacao" class="modal-background">
+    <div class="modal-content-new max-w-xl">
+      <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+        <h2 class="text-xl font-manrope font-extrabold tracking-tight underline decoration-secondary decoration-4 underline-offset-8">[ <span id="anotacao-modal-title">Nova Anotação</span> ]</h2>
+        <button class="close-modal text-gray-500 hover:text-white p-2"><i data-lucide="x"></i></button>
+      </div>
+      <form id="form-anotacao" class="space-y-5">
+        <input type="hidden" id="anotacao-id">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Título</label>
+            <input type="text" id="a-titulo" placeholder="Título da nota" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-secondary/40 transition-all">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Tag</label>
+            <div class="relative flex gap-2">
+              <select id="a-tag" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white appearance-none focus:outline-none focus:border-secondary/40 transition-all">
+                <option value="Ângulos">Ângulos</option><option value="Iluminação">Iluminação</option><option value="Composição">Composição</option>
+                <option value="Dicas">Dicas</option><option value="Estilos">Estilos</option><option value="Câmera">Câmera</option><option value="links">links</option>
+              </select>
+              <button type="button" id="btn-add-tag" class="bg-white/5 border border-white/10 px-3 rounded-xl hover:bg-white/10 transition-all">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Conteúdo</label>
+          <textarea id="a-conteudo" rows="10" placeholder="Escreva suas notas ou cole links aqui..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-secondary/40 transition-all text-sm leading-relaxed"></textarea>
+        </div>
+        <p id="anotacao-error-msg" class="text-red-500 text-[10px] hidden"></p>
+        <div class="flex justify-end gap-3 pt-6 border-t border-white/5 mt-4">
+          <button type="button" class="close-modal px-6 py-3 rounded-full text-sm font-semibold text-gray-400 hover:text-white transition-all">Cancelar</button>
+          <button type="submit" id="btn-submit-anotacao" class="bg-secondary text-white px-8 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(234,88,12,0.3)] hover:scale-105 transition-all">
+            <span class="btn-content">
+              <span class="btn-text">Salvar Nota</span>
+              <span class="btn-spinner hidden ml-2">⟳</span>
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-    <script type="module" src="/src/main.js"></script>
+  <!-- Modal: Visualizar Prompt -->
+  <div id="modal-view-prompt" class="modal-background">
+    <div class="modal-content-new max-w-4xl p-0 overflow-hidden">
+      <div class="flex flex-col md:flex-row h-full">
+        <div id="view-image-container" class="md:w-1/2 bg-black flex items-center justify-center min-h-[300px] border-r border-white/5">
+          <!-- Imagem dinamicamente inserida -->
+        </div>
+        <div class="md:w-1/2 p-8 flex flex-col">
+          <div class="flex justify-between items-start mb-6">
+            <div>
+              <span id="view-category" class="text-[10px] font-bold text-primary border border-primary/30 px-2 py-1 rounded bg-primary/5 uppercase tracking-widest"></span>
+              <h2 id="view-title" class="text-2xl font-manrope font-extrabold mt-3 tracking-tight"></h2>
+            </div>
+            <button class="close-modal text-gray-500 hover:text-white p-2 transition-colors"><i data-lucide="x"></i></button>
+          </div>
+          <p id="view-description" class="text-gray-400 text-sm mb-6 leading-relaxed"></p>
+          <div class="relative group flex-1">
+            <div class="absolute -inset-0.5 bg-gradient-to-br from-primary to-transparent opacity-20 rounded-xl blur"></div>
+            <div class="relative bg-[#050505] border border-white/10 rounded-xl p-5 h-full overflow-hidden flex flex-col">
+              <pre id="view-content" class="flex-1 font-mono text-xs text-gray-300 overflow-y-auto pr-2 scrollbar-none mb-4 whitespace-pre-wrap"></pre>
+              <button id="btn-copy-prompt" class="w-full bg-primary text-white py-3 rounded-lg font-bold text-sm hover:scale-[1.02] active:scale-95 transition-all shadow-[0_10px_20px_rgba(239,35,60,0.3)]">
+                Copiar Prompt
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm/Input Dialogs -->
+  <div id="modal-confirm" class="modal-background">
+    <div class="glass-panel p-8 rounded-3xl max-w-sm w-full text-center">
+      <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20">
+        <i data-lucide="alert-triangle" class="w-8 h-8 text-red-500"></i>
+      </div>
+      <p id="modal-confirm-msg" class="text-white font-bold mb-8"></p>
+      <div class="flex gap-3">
+        <button id="modal-confirm-cancel" class="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white font-semibold transition-all">Cancelar</button>
+        <button id="modal-confirm-ok" class="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold transition-all shadow-[0_10px_20px_rgba(239,68,68,0.3)]">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-input" class="modal-background">
+    <div class="glass-panel p-8 rounded-3xl max-w-sm w-full">
+      <p id="modal-input-label" class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-3 ml-1"></p>
+      <input type="text" id="modal-input-field" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/40 transition-all mb-6">
+      <div class="flex gap-3">
+        <button id="modal-input-cancel" class="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white font-semibold transition-all">Cancelar</button>
+        <button id="modal-input-ok" class="flex-1 py-3 rounded-xl bg-primary text-white font-semibold transition-all shadow-[0_10px_20px_rgba(239,35,60,0.3)]">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast (System.X style) -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-[10000] flex flex-col gap-3"></div>
+
+  <!-- App Logic -->
+  <script type="module" src="/src/main.js"></script>
+  <script>
+    // Initialize Lucide Icons for static elements
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+    });
+  </script>
 </body>
 </html>
