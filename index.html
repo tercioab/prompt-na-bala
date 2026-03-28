@@ -111,9 +111,15 @@
                         <div id="file-chosen" style="text-align: center; font-size: 0.8rem; color: var(--accent-color); min-height: 1.2em;">Nenhum arquivo selecionado</div>
                     </div>
                 </div>
+                <div class="form-group" id="prompt-error-msg" style="display:none;">
+                    <p class="form-error"></p>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary close-modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Criar Prompt</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-prompt">
+                        <span class="btn-text">Criar Prompt</span>
+                        <span class="btn-spinner" style="display:none;">⟳</span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -148,9 +154,15 @@
                     <label for="a-conteudo">Conteúdo</label>
                     <textarea id="a-conteudo" rows="8" placeholder="Escreva suas notas ou cole links aqui..."></textarea>
                 </div>
+                <div class="form-group" id="anotacao-error-msg" style="display:none;">
+                    <p class="form-error"></p>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary close-modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Criar</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-anotacao">
+                        <span class="btn-text">Criar</span>
+                        <span class="btn-spinner" style="display:none;">⟳</span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -176,6 +188,32 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal: Confirmar Deleção (substitui confirm() nativo) -->
+    <div id="modal-confirm" class="modal modal-confirm-overlay">
+        <div class="modal-confirm-box">
+            <p id="modal-confirm-msg" class="modal-confirm-msg">Tem certeza?</p>
+            <div class="modal-confirm-actions">
+                <button id="modal-confirm-cancel" class="btn btn-secondary">Cancelar</button>
+                <button id="modal-confirm-ok" class="btn btn-danger">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Input Customizado (substitui prompt() nativo) -->
+    <div id="modal-input" class="modal modal-confirm-overlay">
+        <div class="modal-confirm-box">
+            <p class="modal-confirm-msg" id="modal-input-label">Nome:</p>
+            <input type="text" id="modal-input-field" class="modal-input-field" placeholder="">
+            <div class="modal-confirm-actions">
+                <button id="modal-input-cancel" class="btn btn-secondary">Cancelar</button>
+                <button id="modal-input-ok" class="btn btn-primary">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
 
     <script type="module" src="/src/main.js"></script>
 </body>
