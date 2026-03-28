@@ -17,29 +17,18 @@
 
   <!-- BACKGROUND SYSTEM -->
   <div class="fixed inset-0 z-[-2] bg-[#080808]"></div>
-  
-  <!-- Unicorn Studio Animated Background -->
   <div class="fixed inset-0 z-[-1] pointer-events-none opacity-40">
     <div data-us-project="sajpUiTp7MIKdX6daDCu" class="w-full h-full"></div>
   </div>
 
-  <!-- Background Beams Decor -->
   <div class="fixed inset-0 z-[-1] flex justify-around pointer-events-none opacity-30">
-    <div class="relative h-full w-px border-l border-white/5">
-        <div class="beam h-64 delay-beam-1"></div>
-    </div>
-    <div class="relative h-full w-px border-l border-white/5">
-        <div class="beam h-64 delay-beam-2"></div>
-    </div>
-    <div class="relative h-full w-px border-l border-white/5">
-        <div class="beam h-64 delay-beam-3"></div>
-    </div>
-    <div class="relative h-full w-px border-l border-white/5">
-        <div class="beam h-64 delay-beam-4"></div>
-    </div>
+    <div class="relative h-full w-px border-l border-white/5"><div class="beam h-64 delay-beam-1"></div></div>
+    <div class="relative h-full w-px border-l border-white/5"><div class="beam h-64 delay-beam-2"></div></div>
+    <div class="relative h-full w-px border-l border-white/5"><div class="beam h-64 delay-beam-3"></div></div>
+    <div class="relative h-full w-px border-l border-white/5"><div class="beam h-64 delay-beam-4"></div></div>
   </div>
 
-  <!-- App Loader -->
+  <!-- APP LOADER -->
   <div id="app-loader" class="fixed inset-0 z-[9999] bg-[#030303] flex items-center justify-center">
     <div class="flex flex-col items-center gap-6">
       <div class="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
@@ -48,13 +37,13 @@
   </div>
 
   <!-- AUTH SCREEN -->
-  <div id="auth-screen" class="fixed inset-0 z-[6000] flex items-center justify-center p-4 bg-transparent overflow-y-auto backdrop-blur-sm hidden">
-    <div class="w-full max-w-md glass-panel p-10 rounded-[2.5rem] shadow-2xl animate-fade-in">
+  <div id="auth-screen" class="fixed inset-0 z-[6000] flex items-center justify-center p-4 bg-transparent backdrop-blur-sm hidden overflow-y-auto">
+    <div class="w-full max-w-md glass-panel p-10 rounded-[2.5rem] shadow-2xl animate-fade-in my-auto">
       
       <!-- LOGIN FORM -->
       <div id="auth-login">
         <div class="text-center mb-10">
-          <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-primary/10 border border-primary/20 mb-6 group transition-all hover:bg-primary/20">
+          <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-primary/10 border border-primary/20 mb-6 transition-all hover:bg-primary/20">
             <i data-lucide="zap" class="w-10 h-10 text-primary animate-pulse"></i>
           </div>
           <h2 class="text-3xl font-manrope font-extrabold tracking-tighter mb-2">PromptVault</h2>
@@ -81,25 +70,14 @@
           <p id="l-error" class="text-red-400 text-xs font-bold px-4 hidden"></p>
 
           <button type="submit" id="btn-login-submit" class="shiny-cta group w-full p-0">
-            <div class="btn-aura-border">
-              <div class="aura-spinner"></div>
-              <div class="btn-aura-inner"></div>
-            </div>
+            <div class="btn-aura-border"><div class="aura-spinner"></div><div class="btn-aura-inner"></div></div>
             <div class="btn-aura-glow btn-aura-glow-default"></div>
-            <div class="points_wrapper">
-              <div class="point"></div><div class="point"></div><div class="point"></div><div class="point"></div><div class="point"></div>
-            </div>
-            <div class="btn-content w-full">
-              <span class="font-bold">Entrar no Sistema</span>
-              <i data-lucide="arrow-right" class="w-5 h-5 transition-transform group-hover:translate-x-1"></i>
-            </div>
+            <div class="points_wrapper"><div class="point"></div><div class="point"></div><div class="point"></div><div class="point"></div><div class="point"></div></div>
+            <div class="btn-content w-full"><span class="font-bold">Entrar no Sistema</span><i data-lucide="arrow-right" class="w-5 h-5 transition-transform group-hover:translate-x-1"></i></div>
           </button>
         </form>
 
-        <p class="text-center mt-8 text-sm text-gray-500 font-medium">
-          Não tem uma conta? 
-          <a href="#" id="go-to-signup" class="text-primary hover:underline font-bold">Criar agora</a>
-        </p>
+        <p class="text-center mt-8 text-sm text-gray-500 font-medium">Não tem uma conta? <a href="#" id="go-to-signup" class="text-primary hover:underline font-bold">Criar agora</a></p>
       </div>
 
       <!-- SIGNUP FORM -->
@@ -135,82 +113,59 @@
               <p id="s-error-confirm" class="text-red-400 text-[10px] pl-4 hidden"></p>
             </div>
           </div>
-
           <p id="s-error-general" class="text-red-400 text-xs font-bold px-4 hidden"></p>
 
           <button type="submit" id="btn-signup-submit" class="shiny-cta group w-full p-0">
-            <div class="btn-aura-border">
-              <div class="aura-spinner"></div>
-              <div class="btn-aura-inner"></div>
-            </div>
+            <div class="btn-aura-border"><div class="aura-spinner"></div><div class="btn-aura-inner"></div></div>
             <div class="btn-aura-glow btn-aura-glow-default"></div>
-            <div class="points_wrapper">
-              <div class="point"></div><div class="point"></div><div class="point"></div>
-            </div>
-            <div class="btn-content w-full">
-              <span>Criar Conta Premium</span>
-              <i data-lucide="user-plus" class="w-5 h-5"></i>
-            </div>
+            <div class="points_wrapper"><div class="point"></div><div class="point"></div><div class="point"></div></div>
+            <div class="btn-content w-full"><span>Criar Conta Premium</span><i data-lucide="user-plus" class="w-5 h-5 ml-2"></i></div>
           </button>
         </form>
-
-        <p class="text-center mt-8 text-sm text-gray-500 font-medium">
-          Já faz parte? 
-          <a href="#" id="go-to-login" class="text-primary hover:underline font-bold">Acessar conta</a>
-        </p>
+        <p class="text-center mt-8 text-sm text-gray-500 font-medium">Já faz parte? <a href="#" id="go-to-login" class="text-primary hover:underline font-bold">Acessar conta</a></p>
       </div>
     </div>
   </div>
 
   <!-- PENDING SCREEN -->
   <div id="pending-screen" class="fixed inset-0 z-[6000] flex items-center justify-center p-4 bg-transparent hidden backdrop-blur-md">
-    <div class="max-w-md text-center glass-panel p-12 rounded-[3rem]">
+    <div class="max-w-md text-center glass-panel p-12 rounded-[3rem] animate-fade-in shadow-2xl">
       <div class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8 relative">
         <div class="absolute inset-0 rounded-full animate-ping bg-primary opacity-20"></div>
         <i data-lucide="mail" class="w-12 h-12 text-primary"></i>
       </div>
       <h2 class="text-3xl font-manrope font-extrabold tracking-tighter mb-4 uppercase">Verifique seu E-mail</h2>
-      <p class="text-gray-400 font-medium mb-2 leading-relaxed">
-        Enviamos um link de confirmação para:
-      </p>
+      <p class="text-gray-400 font-medium mb-2 leading-relaxed">Enviamos um link de confirmação para:</p>
       <p id="pending-user-email" class="text-white font-bold mb-8 break-all"></p>
-      
       <div class="space-y-4">
-        <button id="btn-resend-email" class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-all">
-          Reenviar e-mail de confirmação
-        </button>
-        <button id="resend-back-to-login" class="w-full text-gray-500 text-sm font-bold hover:text-white transition-colors">
-          Voltar para o Login
-        </button>
+        <button id="btn-resend-email" class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-all text-xs uppercase tracking-widest">Reenviar e-mail</button>
+        <button id="resend-back-to-login" class="w-full text-gray-500 text-sm font-bold hover:text-white transition-colors">Voltar para o Login</button>
       </div>
     </div>
   </div>
 
   <!-- APP INTERFACE -->
   <div id="app-interface" class="relative z-10 hidden">
-    <!-- Navbar remains same as last version (already verified) -->
-    <nav class="fixed top-0 left-0 right-0 h-24 flex items-center px-10 z-[100] border-b border-white/5 backdrop-blur-md">
+    <nav class="fixed top-0 left-0 right-0 h-24 flex items-center px-10 z-[100] border-b border-white/5 backdrop-blur-lg">
       <div class="flex items-center gap-4">
         <div class="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-[0_0_20px_rgba(239,35,60,0.4)] animate-pulse">
-          <i data-lucide="zap" class="w-6 h-6 text-white fill-current"></i>
+            <i data-lucide="zap" class="w-6 h-6 text-white fill-current"></i>
         </div>
         <div>
           <h1 class="font-manrope font-extrabold text-xl tracking-tighter text-white">P.VAULT</h1>
           <div class="text-[10px] text-gray-500 font-mono tracking-widest uppercase mt-[-4px]">Intelligence Engine</div>
         </div>
       </div>
-
       <div class="mx-auto flex gap-10">
         <button id="nav-prompts" class="nav-tab tab-active text-sm font-bold uppercase tracking-widest transition-all">Prompts</button>
         <button id="nav-anotacoes" class="nav-tab text-gray-500 text-sm font-bold uppercase tracking-widest transition-all hover:text-white">Anotações</button>
       </div>
-
       <div class="relative group">
-        <button id="user-menu-btn" class="flex items-center gap-3 glass-panel px-4 py-2.5 rounded-2xl hover:bg-white/10 transition-all border-white/10">
-          <div id="user-avatar-container" class="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center text-primary font-bold">
+        <button id="user-avatar" class="flex items-center gap-3 glass-panel px-4 py-2.5 rounded-2xl hover:bg-white/10 transition-all border-white/10">
+          <div id="user-avatar-container" class="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center text-primary font-bold overflow-hidden">
             <span id="user-initial">U</span>
+            <img id="user-avatar-img" src="" class="w-full h-full object-cover hidden" alt="Avatar">
           </div>
-          <img id="user-avatar" src="" class="w-8 h-8 rounded-xl ring-2 ring-primary/20 hidden" alt="Avatar">
           <i data-lucide="chevron-down" class="w-4 h-4 text-gray-500"></i>
         </button>
         <div id="user-dropdown" class="absolute top-full right-0 mt-3 w-64 glass-panel rounded-2xl p-4 shadow-2xl hidden origin-top-right transition-all">
@@ -220,143 +175,162 @@
           </div>
           <div class="h-px bg-white/5 my-3"></div>
           <button id="btn-logout" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-primary/10 text-red-400 transition-all font-semibold text-sm">
-            <span>Encerrar Sessão</span>
-            <i data-lucide="log-out" class="w-4 h-4"></i>
+            <span>Encerrar Sessão</span><i data-lucide="log-out" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
     </nav>
 
     <main class="container mx-auto px-6 pt-32 pb-20">
-      <!-- Grid contents same as before -->
       <section id="section-prompts" class="animate-fade-slide">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div class="space-y-2">
             <div class="flex items-center gap-3 text-primary font-mono text-xs tracking-[0.4em] uppercase">
-              <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-              Sistema de Prompts
+              <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>Sistema de Prompts
             </div>
             <h1 class="text-4xl md:text-6xl font-manrope font-extrabold tracking-tighter text-white">MINHA COLEÇÃO</h1>
-            <p id="prompt-counter" class="text-gray-500 text-sm font-medium">0 prompts sincronizados</p>
+            <p id="prompt-counter" class="text-gray-500 text-sm font-medium">0 prompts salvos</p>
           </div>
-          
-          <button id="btn-new-prompt" class="shiny-cta group p-0 min-w-[180px] h-[52px]">
+          <button id="btn-new-prompt" class="shiny-cta group p-0 min-w-[200px] h-[58px]">
             <div class="btn-aura-border"><div class="aura-spinner"></div><div class="btn-aura-inner"></div></div>
             <div class="btn-aura-glow btn-aura-glow-default"></div>
             <div class="points_wrapper"><div class="point"></div><div class="point"></div><div class="point"></div></div>
             <div class="btn-content"><i data-lucide="plus" class="w-5 h-5"></i><span>Novo Prompt</span></div>
           </button>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="prompts-grid"></div>
+        <div id="prompt-filters" class="flex gap-3 mb-12 overflow-x-auto pb-4 no-scrollbar"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="prompts-grid"></div>
       </section>
 
       <section id="section-anotacoes" class="hidden animate-fade-slide">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div class="space-y-2">
             <div class="flex items-center gap-3 text-amber-500 font-mono text-xs tracking-[0.4em] uppercase">
-              <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-              Brain Dump
+              <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>Brain Dump
             </div>
             <h1 class="text-4xl md:text-6xl font-manrope font-extrabold tracking-tighter text-white">ANOTAÇÕES</h1>
             <p id="anotacao-counter" class="text-gray-500 text-sm font-medium">0 ideias capturadas</p>
           </div>
-          
-          <button id="btn-new-anotacao" class="shiny-cta group p-0 min-w-[180px] h-[52px]" style="background: radial-gradient(65% 65% at 50% 100%, rgba(234, 88, 12, 0.4) 0%, rgba(234, 88, 12, 0.9) 100%), #d97706;">
+          <button id="btn-new-anotacao" class="shiny-cta group p-0 min-w-[200px] h-[58px]" style="background: radial-gradient(65% 65% at 50% 100%, rgba(234, 88, 12, 0.4) 0%, rgba(234, 88, 12, 0.9) 100%), #d97706;">
             <div class="btn-aura-border"><div class="aura-spinner"></div><div class="btn-aura-inner"></div></div>
             <div class="btn-aura-glow btn-aura-glow-default" style="background: radial-gradient(60% 60% at 50% 100%, rgba(234, 88, 12, 0.6) 0%, transparent 100%);"></div>
             <div class="points_wrapper"><div class="point"></div><div class="point"></div><div class="point"></div></div>
             <div class="btn-content"><i data-lucide="edit-3" class="w-5 h-5"></i><span>Criar Nota</span></div>
           </button>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="anotacoes-grid"></div>
+        <div id="anotacao-filters" class="flex gap-3 mb-12 overflow-x-auto pb-4 no-scrollbar"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="anotacoes-grid"></div>
       </section>
     </main>
   </div>
 
-  <!-- MODALS (SÃO ESSENCIAIS PARA O JS) -->
+  <!-- MODALS -->
   <div id="modal-prompt" class="modal-overlay">
-    <div class="modal-content glass-panel rounded-[2.5rem] w-full max-w-2xl p-10">
+    <div class="modal-content glass-panel rounded-[2.5rem] w-full max-w-2xl p-10 shadow-2xl">
         <div class="flex items-center justify-between mb-8">
             <h2 id="prompt-modal-title" class="text-3xl font-manrope font-extrabold tracking-tighter">Novo Prompt</h2>
-            <button class="close-modal text-gray-500 hover:text-white p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <button class="close-modal text-gray-500 hover:text-white p-2 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
         <form id="form-prompt" class="space-y-6">
             <input type="hidden" id="prompt-id">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-2">
                     <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] pl-4">Título do Prompt</label>
-                    <input type="text" id="p-titulo" required class="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none text-white transition-all">
+                    <input type="text" id="p-titulo" required class="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none text-white transition-all font-medium">
                 </div>
                 <div class="space-y-2">
                     <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] pl-4">Categoria</label>
                     <div class="flex gap-2">
-                        <select id="p-categoria" class="flex-1 px-6 py-4 rounded-2xl bg-black border border-white/10 focus:border-primary/50 focus:outline-none text-white appearance-none"></select>
-                        <button type="button" id="btn-add-cat" class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-gray-400 hover:text-white">
-                            <i data-lucide="plus" class="w-5 h-5"></i>
-                        </button>
+                        <select id="p-categoria" class="flex-1 px-6 py-4 rounded-2xl bg-black border border-white/10 focus:border-primary/50 focus:outline-none text-white appearance-none cursor-pointer"></select>
+                        <button type="button" id="btn-add-cat" class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-gray-400 hover:text-white"><i data-lucide="plus" class="w-5 h-5"></i></button>
                     </div>
                 </div>
             </div>
             <div class="space-y-2">
-                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] pl-4">Descrição Rápida (Opcional)</label>
-                <input type="text" id="p-descricao" class="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none text-white transition-all">
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] pl-4">Comando (Prompt Final)</label>
+                <textarea id="p-prompt" required rows="5" class="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none text-white transition-all resize-none font-mono text-sm"></textarea>
             </div>
             <div class="space-y-2">
-                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] pl-4">Comando (Prompt Final)</label>
-                <textarea id="p-prompt" required rows="5" class="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none text-white transition-all resize-none"></textarea>
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] pl-4">Link da Imagem ou Descrição</label>
+                <input type="text" id="p-descricao" class="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none text-white transition-all">
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
                 <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] pl-4">URL da Imagem de Ref.</label>
-                    <input type="url" id="p-imagem-url" class="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none text-white transition-all">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] pl-4">Visual URL</label>
+                    <input type="url" id="p-imagem-url" class="w-full px-6 py-3 rounded-2xl bg-white/5 border border-white/10 focus:border-primary/50 text-white text-xs">
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] pl-4">Ou Upload do PC</label>
-                    <label class="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/5 border border-dashed border-white/20 hover:border-primary/50 cursor-pointer transition-all">
-                        <i data-lucide="upload-cloud" class="w-5 h-5 text-gray-500"></i>
-                        <span id="file-chosen" class="text-xs text-gray-500 font-medium truncate">Selecionar Arquivo</span>
-                        <input type="file" id="p-imagem-file" class="hidden" accept="image/*">
-                    </label>
-                </div>
+                <label class="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/5 border border-dashed border-white/20 hover:border-primary/50 cursor-pointer transition-all">
+                    <i data-lucide="upload-cloud" class="w-5 h-5 text-gray-500"></i>
+                    <span id="file-chosen" class="text-xs text-gray-500 font-medium truncate">Upload PC</span>
+                    <input type="file" id="p-imagem-file" class="hidden" accept="image/*">
+                </label>
             </div>
             <p id="prompt-error-msg" class="text-red-400 text-xs font-bold px-4 hidden"></p>
             <button type="submit" id="btn-submit-prompt" class="shiny-cta group w-full p-0">
                 <div class="btn-aura-border"><div class="aura-spinner"></div><div class="btn-aura-inner"></div></div>
                 <div class="btn-aura-glow btn-aura-glow-default"></div>
-                <div class="points_wrapper"><div class="point"></div><div class="point"></div></div>
-                <div class="btn-content"><span class="btn-text font-bold">Criar Prompt</span></div>
+                <div class="btn-content h-[60px]"><span class="btn-text font-bold">Salvar Prompt</span></div>
             </button>
         </form>
     </div>
   </div>
 
-  <!-- Outros modais essenciais (Confirm, Input, View) seriam colocados aqui conforme estrutura original -->
-  <!-- TOAST CONTAINER -->
-  <div id="toast-container" class="fixed bottom-10 right-10 flex flex-col gap-3 z-[9999]"></div>
+  <div id="modal-anotacao" class="modal-overlay">
+    <div class="modal-content glass-panel rounded-[2.5rem] w-full max-w-xl p-10 shadow-2xl">
+        <div class="flex items-center justify-between mb-8">
+            <h2 id="anotacao-modal-title" class="text-3xl font-manrope font-extrabold tracking-tighter">Nova Anotação</h2>
+            <button class="close-modal text-gray-500 hover:text-white p-2 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <form id="form-anotacao" class="space-y-6">
+            <input type="hidden" id="anotacao-id">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] pl-4">Título da Nota</label>
+                    <input type="text" id="a-titulo" required class="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-amber-500/50 focus:outline-none text-white transition-all font-medium">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] pl-4">Tag / Marcador</label>
+                    <div class="flex gap-2">
+                        <select id="a-tag" class="flex-1 px-6 py-4 rounded-2xl bg-black border border-white/10 focus:border-amber-500/50 text-white appearance-none cursor-pointer"></select>
+                        <button type="button" id="btn-add-tag" class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-gray-400 hover:text-white"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] pl-4">Conteúdo da Ideia</label>
+                <textarea id="a-conteudo" required rows="6" class="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-amber-500/50 focus:outline-none text-white transition-all resize-none leading-relaxed"></textarea>
+            </div>
+            <p id="anotacao-error-msg" class="text-red-400 text-xs font-bold px-4 hidden"></p>
+            <button type="submit" id="btn-submit-anotacao" class="shiny-cta group w-full p-0" style="background: radial-gradient(65% 65% at 50% 100%, rgba(234, 88, 12, 0.4) 0%, rgba(234, 88, 12, 0.9) 100%), #d97706;">
+                <div class="btn-aura-border"><div class="aura-spinner"></div><div class="btn-aura-inner"></div></div>
+                <div class="btn-aura-glow btn-aura-glow-default" style="background: radial-gradient(60% 60% at 50% 100%, rgba(234, 88, 12, 0.6) 0%, transparent 100%);"></div>
+                <div class="btn-content h-[60px]"><span class="btn-text font-bold uppercase tracking-widest">Salvar Anotação</span></div>
+            </button>
+        </form>
+    </div>
+  </div>
 
   <div id="modal-view-prompt" class="modal-overlay">
-    <div class="modal-content glass-panel rounded-[3rem] w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <div class="sticky top-0 right-0 p-6 flex justify-end z-10">
-            <button class="close-modal w-12 h-12 glass-panel rounded-full flex items-center justify-center text-gray-400 hover:text-white transition-all">
+    <div class="modal-content glass-panel rounded-[3.5rem] w-full max-w-4xl max-h-[95vh] overflow-y-auto shadow-2xl relative">
+        <div class="sticky top-0 right-0 p-8 flex justify-end z-10 pointer-events-none">
+            <button class="close-modal w-14 h-14 glass-panel rounded-full flex items-center justify-center text-gray-400 hover:text-white transition-all pointer-events-auto bg-black/40 backdrop-blur-md border-white/10">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
         </div>
         <div class="p-10 pt-0">
-            <div class="flex flex-col md:flex-row gap-10">
-                <div class="w-full md:w-1/2 rounded-[2rem] overflow-hidden border border-white/5 relative bg-white/5 min-h-[400px]">
-                    <img id="view-img" src="" class="w-full h-full object-cover">
-                </div>
-                <div class="w-full md:w-1/2 flex flex-col gap-8">
+            <div class="flex flex-col md:flex-row gap-12">
+                <div id="view-image-container" class="w-full md:w-1/2 rounded-[2.5rem] overflow-hidden border border-white/5 relative bg-white/5 min-h-[450px]"></div>
+                <div class="w-full md:w-1/2 flex flex-col gap-10">
                     <div>
-                        <span id="view-cat" class="px-3 py-1 bg-primary/20 border border-primary/30 rounded-lg text-[10px] font-bold text-primary tracking-widest uppercase mb-4 inline-block"></span>
-                        <h2 id="view-titulo" class="text-4xl font-manrope font-extrabold tracking-tighter text-white"></h2>
+                        <span id="view-category" class="px-4 py-1.5 bg-primary/20 border border-primary/30 rounded-xl text-[10px] font-black text-primary tracking-widest uppercase mb-6 inline-block"></span>
+                        <h2 id="view-title" class="text-4xl md:text-5xl font-manrope font-extrabold tracking-tighter text-white leading-[0.9]"></h2>
                     </div>
-                    <p id="view-desc" class="text-gray-400 leading-relaxed"></p>
-                    <div class="space-y-3">
+                    <p id="view-description" class="text-gray-400 leading-relaxed font-medium"></p>
+                    <div class="space-y-4">
                         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-4">Comando Final</label>
                         <div class="relative group">
-                            <pre id="view-content" class="w-full p-8 rounded-[2rem] bg-white/5 border border-white/10 text-white font-mono text-sm leading-relaxed whitespace-pre-wrap"></pre>
-                            <button id="btn-copy-prompt" class="absolute top-4 right-4 px-4 py-2 bg-primary rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-xl transform transition-all active:scale-95">Copiar Prompt</button>
+                            <pre id="view-content" class="w-full p-8 rounded-[2.5rem] bg-white/5 border border-white/10 text-white font-mono text-sm leading-relaxed whitespace-pre-wrap"></pre>
+                            <button id="btn-copy-prompt" class="absolute top-4 right-4 px-6 py-2.5 bg-primary rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 text-white">Copiar Prompt</button>
                         </div>
                     </div>
                 </div>
@@ -366,29 +340,32 @@
   </div>
 
   <div id="modal-confirm" class="modal-overlay">
-    <div class="modal-confirm-box glass-panel rounded-[2.5rem] p-10 w-full max-w-sm text-center">
-        <div class="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <i data-lucide="alert-triangle" class="w-8 h-8 text-red-500"></i>
+    <div class="modal-confirm-box glass-panel rounded-[2.5rem] p-10 w-full max-w-sm text-center shadow-2xl">
+        <div class="w-20 h-20 bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8 animate-pulse text-red-500">
+            <i data-lucide="alert-triangle" class="w-10 h-10"></i>
         </div>
-        <h3 class="text-2xl font-manrope font-extrabold tracking-tighter mb-2">Tem certeza?</h3>
-        <p id="modal-confirm-msg" class="text-gray-400 mb-8 font-medium"></p>
+        <h3 class="text-2xl font-manrope font-extrabold tracking-tighter mb-4 text-white">Tem certeza?</h3>
+        <p id="modal-confirm-msg" class="text-gray-400 mb-10 font-medium leading-relaxed"></p>
         <div class="flex gap-4">
-            <button id="modal-confirm-cancel" class="flex-1 py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-all text-sm uppercase tracking-widest">Cancelar</button>
-            <button id="modal-confirm-ok" class="flex-1 py-4 rounded-2xl bg-red-500 font-bold hover:bg-red-600 transition-all text-white shadow-xl shadow-red-500/20 text-sm uppercase tracking-widest">Sim, Deletar</button>
+            <button id="modal-confirm-cancel" class="flex-1 py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-all text-[10px] uppercase tracking-widest text-gray-400 hover:text-white">Não, Voltar</button>
+            <button id="modal-confirm-ok" class="flex-1 py-4 rounded-2xl bg-red-500 font-bold hover:bg-red-600 transition-all text-white shadow-xl shadow-red-500/20 text-[10px] uppercase tracking-widest">Sim, Deletar</button>
         </div>
     </div>
   </div>
 
   <div id="modal-input" class="modal-overlay">
-    <div class="modal-confirm-box glass-panel rounded-[2.5rem] p-10 w-full max-w-sm">
-        <h3 id="modal-input-label" class="text-xl font-manrope font-extrabold tracking-tighter mb-6 text-center"></h3>
-        <input type="text" id="modal-input-field" class="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none text-white mb-6">
+    <div class="modal-confirm-box glass-panel rounded-[2.5rem] p-10 w-full max-w-sm shadow-2xl">
+        <h3 id="modal-input-label" class="text-2xl font-manrope font-extrabold tracking-tighter mb-8 text-center text-white leading-tight"></h3>
+        <input type="text" id="modal-input-field" class="w-full px-8 py-5 rounded-2xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none text-white mb-8 font-medium">
         <div class="flex gap-4">
-            <button id="modal-input-cancel" class="flex-1 py-4 rounded-2xl bg-white/5 border border-white/10 font-bold text-sm uppercase">Cancelar</button>
-            <button id="modal-input-ok" class="flex-1 py-4 rounded-2xl bg-primary font-bold text-white shadow-xl text-sm uppercase">Confirmar</button>
+            <button id="modal-input-cancel" class="flex-1 py-4 rounded-2xl bg-white/5 border border-white/10 font-bold text-[10px] uppercase tracking-widest text-gray-500">Cancelar</button>
+            <button id="modal-input-ok" class="flex-1 py-4 rounded-2xl bg-primary font-bold text-white shadow-xl text-[10px] uppercase tracking-widest">Confirmar</button>
         </div>
     </div>
   </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="fixed bottom-10 right-10 flex flex-col gap-4 z-[9999] pointer-events-none"></div>
 
   <!-- Unicorn Studio Lib -->
   <script>
